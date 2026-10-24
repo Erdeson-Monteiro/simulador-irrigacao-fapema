@@ -1,0 +1,14 @@
+# Banco SQLite gerado na execução (guarda o token do dispositivo)
+data/irrigacao.db
+
+# Python
+__pycache__/
+*.pyc
+
+# Segredos e cópias locais
+.env
+backups/
+
+# Cópia integral do projeto de 17/10/2026, idêntica ao commit v1-parecer,
+# mas que inclui data/irrigacao.db; fica só no disco
+pacote_artigo_fapema_irrigacao.zip

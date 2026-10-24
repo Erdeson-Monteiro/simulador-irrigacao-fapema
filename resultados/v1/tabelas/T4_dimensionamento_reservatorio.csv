@@ -1,0 +1,7 @@
+periodo,intervalo_reabastecimento_dias,demanda_etc_media_mm_dia,precipitacao_total_mm,capacidade_minima_conforto_90_l,oferta_maxima_na_cap_minima_mm_dia,conforto_obtido_pct,lamina_aplicada_mm,d2_incremental_mm,eficiencia_incremental_pct
+Estacao_Chuvosa,3,4.72,299.2,250.0,8.33,97.14,198.51,88.12,55.61
+Estacao_Chuvosa,7,4.72,299.2,500.0,7.14,98.57,195.71,85.32,56.4
+Estacao_Chuvosa,14,4.72,299.2,750.0,5.36,98.57,181.7,71.32,60.75
+Estacao_Seca,3,5.44,42.2,250.0,8.33,98.57,354.83,19.65,94.46
+Estacao_Seca,7,5.44,42.2,500.0,7.14,95.71,360.29,21.6,94.0
+Estacao_Seca,14,5.44,42.2,1000.0,7.14,95.71,358.62,19.93,94.44

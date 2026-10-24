@@ -1,0 +1,29 @@
+simbolo,significado,valor,unidade,origem
+θ_sat,Umidade volumétrica do solo na saturação,0.45,cm³/cm³,[FONTE A PREENCHER PELO AUTOR]
+θ_cc,Umidade volumétrica do solo na capacidade de campo,0.28,cm³/cm³,[FONTE A PREENCHER PELO AUTOR]
+θ_pmp,Umidade volumétrica do solo no ponto de murcha permanente,0.14,cm³/cm³,[FONTE A PREENCHER PELO AUTOR]
+p,Fração de depleção da água disponível tolerada antes do estresse hídrico,0.35,adimensional,[FONTE A PREENCHER PELO AUTOR]
+z1,Espessura da Camada 1 (zona radicular ativa: 0 a 20 cm),200,mm,[FONTE A PREENCHER PELO AUTOR]
+z2,Espessura da Camada 2 (abaixo da zona radicular: 20 a 40 cm),200,mm,[FONTE A PREENCHER PELO AUTOR]
+AD,Capacidade de água disponível na zona radicular,28.0,mm,derivado: AD = (θ_cc − θ_pmp) × z1
+θ_lim,Limiar crítico de umidade volumétrica na Camada 1 para conforto hídrico e disparo da E1,0.231,cm³/cm³,derivado: θ_lim = θ_cc − p × (θ_cc − θ_pmp)
+S1_cc,Lâmina máxima retida na Camada 1 na capacidade de campo,56.0,mm,derivado: S1_cc = θ_cc × z1
+S2_cc,Lâmina máxima retida na Camada 2 na capacidade de campo,56.0,mm,derivado: S2_cc = θ_cc × z2
+S1_pmp,Armazenamento residual mínimo na Camada 1 no ponto de murcha permanente,28.0,mm,derivado: S1_pmp = θ_pmp × z1
+S1_sat,Armazenamento de saturação por camada,90.0,mm,derivado: S1_sat = θ_sat × z1
+Deficit_solo_lim,Depleção hídrica na Camada 1 correspondente exatamente a θ_lim,9.80,mm,derivado: Deficit_solo_lim = (θ_cc − θ_lim) × z1 = p × AD
+Kc_ini,Coeficiente de cultura na fase inicial (dias 1 a 15 do ciclo),0.70,adimensional,[FONTE A PREENCHER PELO AUTOR]
+Kc_med,Coeficiente de cultura na fase intermediária (dias 16 a 55 do ciclo),1.00,adimensional,[FONTE A PREENCHER PELO AUTOR]
+Kc_fim,Coeficiente de cultura na fase final (dias 56 a 70 do ciclo),0.95,adimensional,[FONTE A PREENCHER PELO AUTOR]
+lamina_fixa,Lâmina nominal por acionamento na estratégia E1 (referência e varredura),"10.0 (varredura: 5, 10, 15, 20, 25, 30)",mm,[FONTE A PREENCHER PELO AUTOR]
+limiar_deficit,Gatilho de déficit acumulado para acionamento nas estratégias E2 e E3,10.0,mm,[FONTE A PREENCHER PELO AUTOR]
+area_canteiro,Área útil do canteiro monitorado para conversão entre lâmina (mm) e volume (L),10.0,m²,[FONTE A PREENCHER PELO AUTOR]
+V_cap (Abundante / Moderado / Restrito),Capacidade nominal do reservatório nos cenários padrão (e varredura 250–2000 L),1000 / 500 / 500,L,[FONTE A PREENCHER PELO AUTOR]
+Δt_reab (Abundante / Moderado / Restrito),Intervalo entre reabastecimentos do reservatório nos cenários padrão,3 / 7 / 14,dias,[FONTE A PREENCHER PELO AUTOR]
+Gsc,Constante solar extraterrestre na equação de Ra,0.0820,MJ·m⁻²·min⁻¹,[FONTE A PREENCHER PELO AUTOR]
+f_conv_Ra,Fator de conversão de radiação (MJ·m⁻²·dia⁻¹) em equivalente de evaporação (mm·dia⁻¹),0.408,mm·m²·MJ⁻¹,[FONTE A PREENCHER PELO AUTOR]
+"c_HS, T_offset, exp_HS","Coeficientes empíricos da equação de ET0 (0,0023; 17,8 °C; expoente térmico 0,5)",0.0023; 17.8; 0.5,°C⁻¹·⁵; °C; adim.,[FONTE A PREENCHER PELO AUTOR]
+"c_dr, c_δ1, c_δ2","Constantes astronômicas de distância relativa Terra-Sol (0,033) e declinação solar (0,409 rad; 1,39 rad)",0.033; 0.409; 1.39,adim.; rad; rad,[FONTE A PREENCHER PELO AUTOR]
+φ (latitude),Latitude geográfica da estação meteorológica usada no cálculo de Ra,-7.45555555,graus decimais,extraído do arquivo INMET (campo LATITUDE:; do bloco de metadados)
+λ (longitude),Longitude geográfica da estação meteorológica,-46.02749999,graus decimais,extraído do arquivo INMET (campo LONGITUDE:; do bloco de metadados)
+z_est (altitude),Altitude geométrica da estação meteorológica,271.03,m,extraído do arquivo INMET (campo ALTITUDE:; do bloco de metadados)
