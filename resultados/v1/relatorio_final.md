@@ -480,10 +480,10 @@ Série diária completa: [`rodadas/rodadas_varredura_reservatorio_e3_diario.csv`
 | **Versão do SQLite (`sqlite3`)** | `3.45.1` |
 | **Versão do `matplotlib`** | `3.11.2` |
 | **Versão do `numpy`** | `2.5.4` |
-| **Hash do commit Git** | `c4dcceac7216ef02179fc90daf005f8ca5918db8` |
+| **Hash do commit Git** | `35f218c0bbc7de63e76c8bfaf7e416676741e3e1` |
 | **Comando exato para reproduzir todas as rodadas, tabelas, figuras e relatório do zero** | `python3 main.py pipeline --modelo v1` |
 | **Comando exato para executar a suíte de testes de validação** | `python3 -m unittest discover -s tests -v` |
-| **Tempo de execução total medido** | `5.983 segundos` |
+| **Tempo de execução total medido** | `6.773 segundos` |
 | **Confirmação sobre aleatoriedade** | Não há aleatoriedade em nenhum componente do projeto. Nenhum gerador pseudoaleatório (random / numpy.random) é importado ou invocado; todas as equações físicas, regras de decisão e agregações são estritamente determinísticas. |
 | **Semente aleatória (`seed`)** | `Não aplicável (modelo 100% determinístico)` |
 

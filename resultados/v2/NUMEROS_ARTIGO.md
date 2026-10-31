@@ -583,4 +583,4 @@ Varredura de 250 a 2.000 L, passo de 250 L. Quando nenhuma capacidade atende, TS
 
 | Nº | Descrição | Valor | Fonte |
 |---:|---|---:|---|
-| 521 | Tempo de execução do pipeline | 7,4 s | `AMBIENTE.md` |
+| 521 | Tempo de execução do pipeline | 8,9 s | `AMBIENTE.md` |

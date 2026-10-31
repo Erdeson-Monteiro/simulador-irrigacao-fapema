@@ -11,11 +11,11 @@
 | SQLite | 3.45.1 |
 | Fonte das figuras | LiberationSerif-Regular.ttf |
 | Impressão digital do código (SHA-256 de src/, main.py, requirements.txt e data/raw/) | `d3fe1a05a09a470f6b69a40583d4cd53ca694fbcc0bb91c58e61f73dae2e2ac5` |
-| Último commit do git que alterou o código | 9d895e32c9d7094944e0516573dfec426e9b63f9 |
+| Último commit do git que alterou o código | 35f218c0bbc7de63e76c8bfaf7e416676741e3e1 |
 | Comando | `python3 main.py pipeline` |
 | Rodadas simuladas | 196 |
-| Tempo das rodadas | 4,5 s |
-| Tempo total do pipeline | 7,4 s |
+| Tempo das rodadas | 5,4 s |
+| Tempo total do pipeline | 8,9 s |
 
 | Biblioteca | Versão |
 |---|---|

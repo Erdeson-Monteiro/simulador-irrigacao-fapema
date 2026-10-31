@@ -358,7 +358,7 @@ Lista completa na seção 9 de `docs/MODELO.md`: um só ano; camada 2 sem extra�
 
 ## 13. Reprodutibilidade
 
-Ambiente e tempo de execução em [`AMBIENTE.md`](AMBIENTE.md) (7,4 s nesta execução). SHA-256 de cada CSV em [`CHECKSUMS.txt`](CHECKSUMS.txt).
+Ambiente e tempo de execução em [`AMBIENTE.md`](AMBIENTE.md) (8,9 s nesta execução). SHA-256 de cada CSV em [`CHECKSUMS.txt`](CHECKSUMS.txt).
 
 ## 14. Arquivos
 
