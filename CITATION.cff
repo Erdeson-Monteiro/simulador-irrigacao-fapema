@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "Se usar este software ou os seus resultados, cite-o como indicado abaixo."
+type: software
+title: "Automação da Irrigação em Hortas Comunitárias com Sensores e IoT: simulador de manejo de irrigação"
+abstract: >-
+  Simulador de manejo de irrigação de um canteiro de alface em horta comunitária.
+  Compara três regras de irrigação (limiar fixo, reposição por balanço hídrico e
+  racionamento uniforme) num balanço hídrico horário do solo em duas camadas,
+  com ET0 horária por Penman-Monteith (FAO-56) e dados reais da estação automática
+  A204 do INMET (Balsas-MA, 2023). Inclui a API de ingestão e o painel que receberão
+  os dados do protótipo de campo. Projeto PIC/FAPEMA, Edital COORD.NUPEX nº 01/2026.
+authors:
+  - given-names: Erdeson Monteiro
+    family-names: Candeias
+  - given-names: Alex Rogaleski
+    family-names: Marques
+repository-code: "https://github.com/Erdeson-Monteiro/simulador-irrigacao-fapema"
+license: MIT
+keywords:
+  - irrigação
+  - balanço hídrico
+  - FAO-56
+  - Penman-Monteith
+  - evapotranspiração
+  - agricultura urbana
+  - IoT
+  - INMET

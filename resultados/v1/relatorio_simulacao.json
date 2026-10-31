@@ -349,7 +349,7 @@
         "altitude_m": 271.03,
         "altitude_verbatim": "271,03",
         "data_fundacao": "26/10/07",
-        "arquivo_bruto_caminho": "/home/erdeson/projeto-fapema/data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV",
+        "arquivo_bruto_caminho": "data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV",
         "arquivo_bruto_nome": "INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV",
         "sha256_bruto": "7aa68f3a9a2c09ef19a822490fb5fe957c1e0b37bed7ca6b084e3e38d450b233",
         "tamanho_bytes": 764609,
@@ -388,8 +388,8 @@
           "t_min": "TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)"
         },
         "arquivos_processados_gerados": [
-          "/home/erdeson/projeto-fapema/data/processed/inmet_A204_balsas_2023_diario_bruto_agregado.csv",
-          "/home/erdeson/projeto-fapema/data/processed/inmet_A204_balsas_2023_ciclos_70d_tratados.csv"
+          "resultados/v1/processed/inmet_A204_balsas_2023_diario_bruto_agregado.csv",
+          "resultados/v1/processed/inmet_A204_balsas_2023_ciclos_70d_tratados.csv"
         ]
       },
       "total_dias": 140,
@@ -3903,42 +3903,42 @@
       "significado": "Umidade volumétrica do solo na saturação",
       "valor": "0.45",
       "unidade": "cm³/cm³",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "premissa do modelo; não altera nenhum resultado (a água acima de θ_cc drena no mesmo passo)"
     },
     {
       "simbolo": "θ_cc",
       "significado": "Umidade volumétrica do solo na capacidade de campo",
       "valor": "0.28",
       "unidade": "cm³/cm³",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "FAO-56, Tabela 19 (solo franco: θcc 0,20–0,30), página [A CONFIRMAR PELO AUTOR]; valor dentro da faixa"
     },
     {
       "simbolo": "θ_pmp",
       "significado": "Umidade volumétrica do solo no ponto de murcha permanente",
       "valor": "0.14",
       "unidade": "cm³/cm³",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "FAO-56, Tabela 19 (solo franco: θpmp 0,07–0,17), página [A CONFIRMAR PELO AUTOR]; valor dentro da faixa"
     },
     {
       "simbolo": "p",
       "significado": "Fração de depleção da água disponível tolerada antes do estresse hídrico",
       "valor": "0.35",
       "unidade": "adimensional",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "sem fonte: o FAO-56, Tabela 22, indica p = 0,30 para alface (valor adotado no v2)"
     },
     {
       "simbolo": "z1",
       "significado": "Espessura da Camada 1 (zona radicular ativa: 0 a 20 cm)",
       "valor": "200",
       "unidade": "mm",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "Marouelli et al. (2008), página [A CONFIRMAR PELO AUTOR]; FAO-56, Tabela 22 (profundidade máxima 0,3–0,5 m)"
     },
     {
       "simbolo": "z2",
       "significado": "Espessura da Camada 2 (abaixo da zona radicular: 20 a 40 cm)",
       "valor": "200",
       "unidade": "mm",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "premissa do modelo"
     },
     {
       "simbolo": "AD",
@@ -3994,84 +3994,84 @@
       "significado": "Coeficiente de cultura na fase inicial (dias 1 a 15 do ciclo)",
       "valor": "0.70",
       "unidade": "adimensional",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "valor: FAO-56, Tabela 12 (grupo Small Vegetables); fase em degrau (dias 1 a 15) sem fonte, trocada no v2 pela curva da eq. 66 com as fases da Tabela 11"
     },
     {
       "simbolo": "Kc_med",
       "significado": "Coeficiente de cultura na fase intermediária (dias 16 a 55 do ciclo)",
       "valor": "1.00",
       "unidade": "adimensional",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "valor: FAO-56, Tabela 12 (alface); fase em degrau (dias 16 a 55) sem fonte, trocada no v2 pela curva da eq. 66"
     },
     {
       "simbolo": "Kc_fim",
       "significado": "Coeficiente de cultura na fase final (dias 56 a 70 do ciclo)",
       "valor": "0.95",
       "unidade": "adimensional",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "valor: FAO-56, Tabela 12 (alface); fase em degrau (dias 56 a 70) sem fonte, trocada no v2 pela curva da eq. 66"
     },
     {
       "simbolo": "lamina_fixa",
       "significado": "Lâmina nominal por acionamento na estratégia E1 (referência e varredura)",
       "valor": "10.0 (varredura: 5, 10, 15, 20, 25, 30)",
       "unidade": "mm",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "premissa do modelo"
     },
     {
       "simbolo": "limiar_deficit",
       "significado": "Gatilho de déficit acumulado para acionamento nas estratégias E2 e E3",
       "valor": "10.0",
       "unidade": "mm",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "premissa do v1; não corresponde a p × AD = 9.80 mm (banda morta); no v2 o gatilho é o RAW calculado"
     },
     {
       "simbolo": "area_canteiro",
       "significado": "Área útil do canteiro monitorado para conversão entre lâmina (mm) e volume (L)",
       "valor": "10.0",
       "unidade": "m²",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "premissa do modelo"
     },
     {
       "simbolo": "V_cap (Abundante / Moderado / Restrito)",
       "significado": "Capacidade nominal do reservatório nos cenários padrão (e varredura 250–2000 L)",
       "valor": "1000 / 500 / 500",
       "unidade": "L",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "premissa de cenário"
     },
     {
       "simbolo": "Δt_reab (Abundante / Moderado / Restrito)",
       "significado": "Intervalo entre reabastecimentos do reservatório nos cenários padrão",
       "valor": "3 / 7 / 14",
       "unidade": "dias",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "premissa de cenário"
     },
     {
       "simbolo": "Gsc",
       "significado": "Constante solar extraterrestre na equação de Ra",
       "valor": "0.0820",
       "unidade": "MJ·m⁻²·min⁻¹",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "FAO-56, eq. 21"
     },
     {
       "simbolo": "f_conv_Ra",
       "significado": "Fator de conversão de radiação (MJ·m⁻²·dia⁻¹) em equivalente de evaporação (mm·dia⁻¹)",
       "valor": "0.408",
       "unidade": "mm·m²·MJ⁻¹",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "FAO-56, eq. 20 (1/λ)"
     },
     {
       "simbolo": "c_HS, T_offset, exp_HS",
       "significado": "Coeficientes empíricos da equação de ET0 (0,0023; 17,8 °C; expoente térmico 0,5)",
       "valor": "0.0023; 17.8; 0.5",
       "unidade": "°C⁻¹·⁵; °C; adim.",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "Hargreaves e Samani (1985); FAO-56, eq. 52"
     },
     {
       "simbolo": "c_dr, c_δ1, c_δ2",
       "significado": "Constantes astronômicas de distância relativa Terra-Sol (0,033) e declinação solar (0,409 rad; 1,39 rad)",
       "valor": "0.033; 0.409; 1.39",
       "unidade": "adim.; rad; rad",
-      "origem": "[FONTE A PREENCHER PELO AUTOR]"
+      "origem": "FAO-56, eqs. 23 e 24"
     },
     {
       "simbolo": "φ (latitude)",
@@ -4098,53 +4098,53 @@
   "figuras_geradas": [
     {
       "figura": "F1_estacao_chuvosa",
-      "png": "/home/erdeson/projeto-fapema/figuras/F1_umidade_solo_estacao_chuvosa.png",
-      "csv": "/home/erdeson/projeto-fapema/figuras/F1_umidade_solo_estacao_chuvosa.csv"
+      "png": "resultados/v1/figuras/F1_umidade_solo_estacao_chuvosa.png",
+      "csv": "resultados/v1/figuras/F1_umidade_solo_estacao_chuvosa.csv"
     },
     {
       "figura": "F1_estacao_seca",
-      "png": "/home/erdeson/projeto-fapema/figuras/F1_umidade_solo_estacao_seca.png",
-      "csv": "/home/erdeson/projeto-fapema/figuras/F1_umidade_solo_estacao_seca.csv"
+      "png": "resultados/v1/figuras/F1_umidade_solo_estacao_seca.png",
+      "csv": "resultados/v1/figuras/F1_umidade_solo_estacao_seca.csv"
     },
     {
       "figura": "F2_estacao_chuvosa",
-      "png": "/home/erdeson/projeto-fapema/figuras/F2_sensibilidade_e1_estacao_chuvosa.png",
-      "csv": "/home/erdeson/projeto-fapema/figuras/F2_sensibilidade_e1_estacao_chuvosa.csv"
+      "png": "resultados/v1/figuras/F2_sensibilidade_e1_estacao_chuvosa.png",
+      "csv": "resultados/v1/figuras/F2_sensibilidade_e1_estacao_chuvosa.csv"
     },
     {
       "figura": "F2_estacao_seca",
-      "png": "/home/erdeson/projeto-fapema/figuras/F2_sensibilidade_e1_estacao_seca.png",
-      "csv": "/home/erdeson/projeto-fapema/figuras/F2_sensibilidade_e1_estacao_seca.csv"
+      "png": "resultados/v1/figuras/F2_sensibilidade_e1_estacao_seca.png",
+      "csv": "resultados/v1/figuras/F2_sensibilidade_e1_estacao_seca.csv"
     },
     {
       "figura": "F3_estacao_chuvosa",
-      "png": "/home/erdeson/projeto-fapema/figuras/F3_dimensionamento_estacao_chuvosa.png",
-      "csv": "/home/erdeson/projeto-fapema/figuras/F3_dimensionamento_estacao_chuvosa.csv"
+      "png": "resultados/v1/figuras/F3_dimensionamento_estacao_chuvosa.png",
+      "csv": "resultados/v1/figuras/F3_dimensionamento_estacao_chuvosa.csv"
     },
     {
       "figura": "F3_estacao_seca",
-      "png": "/home/erdeson/projeto-fapema/figuras/F3_dimensionamento_estacao_seca.png",
-      "csv": "/home/erdeson/projeto-fapema/figuras/F3_dimensionamento_estacao_seca.csv"
+      "png": "resultados/v1/figuras/F3_dimensionamento_estacao_seca.png",
+      "csv": "resultados/v1/figuras/F3_dimensionamento_estacao_seca.csv"
     },
     {
       "figura": "F4_estacao_chuvosa",
-      "png": "/home/erdeson/projeto-fapema/figuras/F4_barras_comparativas_estacao_chuvosa.png",
-      "csv": "/home/erdeson/projeto-fapema/figuras/F4_barras_comparativas_estacao_chuvosa.csv"
+      "png": "resultados/v1/figuras/F4_barras_comparativas_estacao_chuvosa.png",
+      "csv": "resultados/v1/figuras/F4_barras_comparativas_estacao_chuvosa.csv"
     },
     {
       "figura": "F4_estacao_seca",
-      "png": "/home/erdeson/projeto-fapema/figuras/F4_barras_comparativas_estacao_seca.png",
-      "csv": "/home/erdeson/projeto-fapema/figuras/F4_barras_comparativas_estacao_seca.csv"
+      "png": "resultados/v1/figuras/F4_barras_comparativas_estacao_seca.png",
+      "csv": "resultados/v1/figuras/F4_barras_comparativas_estacao_seca.csv"
     },
     {
       "figura": "F5_estacao_chuvosa",
-      "png": "/home/erdeson/projeto-fapema/figuras/F5_nivel_reservatorio_restrito_estacao_chuvosa.png",
-      "csv": "/home/erdeson/projeto-fapema/figuras/F5_nivel_reservatorio_restrito_estacao_chuvosa.csv"
+      "png": "resultados/v1/figuras/F5_nivel_reservatorio_restrito_estacao_chuvosa.png",
+      "csv": "resultados/v1/figuras/F5_nivel_reservatorio_restrito_estacao_chuvosa.csv"
     },
     {
       "figura": "F5_estacao_seca",
-      "png": "/home/erdeson/projeto-fapema/figuras/F5_nivel_reservatorio_restrito_estacao_seca.png",
-      "csv": "/home/erdeson/projeto-fapema/figuras/F5_nivel_reservatorio_restrito_estacao_seca.csv"
+      "png": "resultados/v1/figuras/F5_nivel_reservatorio_restrito_estacao_seca.png",
+      "csv": "resultados/v1/figuras/F5_nivel_reservatorio_restrito_estacao_seca.csv"
     }
   ],
   "reprodutibilidade": {
@@ -4153,43 +4153,43 @@
     "sqlite3_version": "3.45.1",
     "matplotlib_version": "3.11.2",
     "numpy_version": "2.5.4",
-    "git_commit_hash": "Não aplicável (diretório de trabalho sem repositório Git inicializado / .git ausente)",
-    "comando_reproducao": "python3 main.py",
+    "git_commit_hash": "c4dcceac7216ef02179fc90daf005f8ca5918db8",
+    "comando_reproducao": "python3 main.py pipeline --modelo v1",
     "comando_testes": "python3 -m unittest discover -s tests -v",
-    "tempo_execucao_total_s": 5.78,
+    "tempo_execucao_total_s": 5.983,
     "aleatoriedade": "Não há aleatoriedade em nenhum componente do projeto. Nenhum gerador pseudoaleatório (random / numpy.random) é importado ou invocado; todas as equações físicas, regras de decisão e agregações são estritamente determinísticas.",
     "semente_aleatoria": "Não aplicável (modelo 100% determinístico)"
   },
   "arquivos_tabelas_csv": [
-    "/home/erdeson/projeto-fapema/data/tabelas/T1_caracterizacao_climatica.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T2_comparacao_principal.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T3_sensibilidade_e1.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T4_dimensionamento_reservatorio.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T5_varredura_reservatorio.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T6_testes_validacao_fisica.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T7_qualidade_dado_climatico.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T8_parametros_e_fontes.csv"
+    "resultados/v1/tabelas/T1_caracterizacao_climatica.csv",
+    "resultados/v1/tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv",
+    "resultados/v1/tabelas/T2_comparacao_principal.csv",
+    "resultados/v1/tabelas/T3_sensibilidade_e1.csv",
+    "resultados/v1/tabelas/T4_dimensionamento_reservatorio.csv",
+    "resultados/v1/tabelas/T5_varredura_reservatorio.csv",
+    "resultados/v1/tabelas/T6_testes_validacao_fisica.csv",
+    "resultados/v1/tabelas/T7_qualidade_dado_climatico.csv",
+    "resultados/v1/tabelas/T8_parametros_e_fontes.csv"
   ],
   "arquivos_rodadas_csv": [
-    "/home/erdeson/projeto-fapema/data/rodadas/rodadas_comparacao_principal_diario.csv",
-    "/home/erdeson/projeto-fapema/data/rodadas/rodadas_sensibilidade_e1_diario.csv",
-    "/home/erdeson/projeto-fapema/data/rodadas/rodadas_varredura_reservatorio_e3_diario.csv",
-    "/home/erdeson/projeto-fapema/data/rodadas/rodadas_validacao_fisica_diario.csv"
+    "resultados/v1/rodadas/rodadas_comparacao_principal_diario.csv",
+    "resultados/v1/rodadas/rodadas_sensibilidade_e1_diario.csv",
+    "resultados/v1/rodadas/rodadas_varredura_reservatorio_e3_diario.csv",
+    "resultados/v1/rodadas/rodadas_validacao_fisica_diario.csv"
   ],
   "arquivos_csv_brutos": [
-    "/home/erdeson/projeto-fapema/data/tabelas/T1_caracterizacao_climatica.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T2_comparacao_principal.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T3_sensibilidade_e1.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T4_dimensionamento_reservatorio.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T5_varredura_reservatorio.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T6_testes_validacao_fisica.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T7_qualidade_dado_climatico.csv",
-    "/home/erdeson/projeto-fapema/data/tabelas/T8_parametros_e_fontes.csv",
-    "/home/erdeson/projeto-fapema/data/rodadas/rodadas_comparacao_principal_diario.csv",
-    "/home/erdeson/projeto-fapema/data/rodadas/rodadas_sensibilidade_e1_diario.csv",
-    "/home/erdeson/projeto-fapema/data/rodadas/rodadas_varredura_reservatorio_e3_diario.csv",
-    "/home/erdeson/projeto-fapema/data/rodadas/rodadas_validacao_fisica_diario.csv"
+    "resultados/v1/tabelas/T1_caracterizacao_climatica.csv",
+    "resultados/v1/tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv",
+    "resultados/v1/tabelas/T2_comparacao_principal.csv",
+    "resultados/v1/tabelas/T3_sensibilidade_e1.csv",
+    "resultados/v1/tabelas/T4_dimensionamento_reservatorio.csv",
+    "resultados/v1/tabelas/T5_varredura_reservatorio.csv",
+    "resultados/v1/tabelas/T6_testes_validacao_fisica.csv",
+    "resultados/v1/tabelas/T7_qualidade_dado_climatico.csv",
+    "resultados/v1/tabelas/T8_parametros_e_fontes.csv",
+    "resultados/v1/rodadas/rodadas_comparacao_principal_diario.csv",
+    "resultados/v1/rodadas/rodadas_sensibilidade_e1_diario.csv",
+    "resultados/v1/rodadas/rodadas_varredura_reservatorio_e3_diario.csv",
+    "resultados/v1/rodadas/rodadas_validacao_fisica_diario.csv"
   ]
 }

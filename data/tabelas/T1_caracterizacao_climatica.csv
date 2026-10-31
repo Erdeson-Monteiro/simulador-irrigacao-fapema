@@ -1,3 +1,0 @@
-ciclo,data_inicial,data_final,dias_ciclo,precipitacao_acumulada_mm,et0_acumulada_mm,et0_media_mm_dia,etc_acumulada_mm,etc_media_mm_dia,t_media_ciclo_c,t_max_absoluta_c,t_min_absoluta_c,dias_com_chuva,maior_evento_chuva_mm,data_maior_evento_chuva
-Estacao_Chuvosa,2023-01-15,2023-03-25,70,299.2,356.77,5.1,330.57,4.72,25.63,35.9,19.2,39,96.8,2023-03-18
-Estacao_Seca,2023-07-01,2023-09-08,70,42.2,408.84,5.84,380.89,5.44,27.36,40.1,14.2,4,27.6,2023-08-31

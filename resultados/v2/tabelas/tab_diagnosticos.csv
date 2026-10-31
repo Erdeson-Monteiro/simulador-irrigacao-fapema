@@ -1,0 +1,37 @@
+# conteudo: diagnósticos para as limitações (formato longo)
+# origem: PIC/FAPEMA, simulador de irrigação v2 (docs/MODELO.md); gerado por python3 main.py pipeline
+# clima: data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV (SHA-256 7aa68f3a9a2c09ef19a822490fb5fe957c1e0b37bed7ca6b084e3e38d450b233); estação A204 BALSAS-MA, lat -7.45555555, lon -46.02749999, alt 271.03 m
+# parametros: theta_cc=0.28; theta_pmp=0.14; theta_sat=0.45; p=0.3; z1_mm=200; z2_mm=200; f_ext2=0; theta1_inicial=0.28; theta2_inicial=0.28; kc_ini=0.7; kc_mid=1; kc_end=0.95; fases_tabela_dias=20/30/15/10; duracao_ciclo_dias=70; lamina_e1_mm=10; area_m2=10; taw_mm=28; raw_mm=8.4; theta_lim=0.238; fases_dias=19/28/14/9; s1_cc_mm=56; s1_pmp_mm=28; s2_cc_mm=56
+diagnostico,descricao,escopo,valor,unidade
+kc_mid_ajustado,"Kc,mid com o ajuste climático (eq. 62; h = 0,3 m)",chuvoso,0.955538,—
+kc_mid_ajustado,"Kc,mid com o ajuste climático (eq. 62; h = 0,3 m)",seco,1.016436,—
+kc_mid_diferenca,"Diferença para o Kc,mid da Tabela 12",chuvoso,-0.044462,—
+kc_mid_diferenca,"Diferença para o Kc,mid da Tabela 12",seco,0.016436,—
+u2_medio_fase_media_ms,u₂ médio da fase média,chuvoso,0.717899,m/s
+u2_medio_fase_media_ms,u₂ médio da fase média,seco,0.984134,m/s
+urmin_media_fase_media_pct,URmin média da fase média,chuvoso,54.357143,%
+urmin_media_fase_media_pct,URmin média da fase média,seco,26.642857,%
+etc_diaria_min_mm,ETc diária mínima,chuvoso,0.912962,mm/d
+etc_diaria_min_mm,ETc diária mínima,seco,3.037069,mm/d
+etc_diaria_max_mm,ETc diária máxima,chuvoso,5.261286,mm/d
+etc_diaria_max_mm,ETc diária máxima,seco,6.089458,mm/d
+p_ajustado_min,"p ajustado pela ETc diária, mínimo",chuvoso,0.289549,—
+p_ajustado_min,"p ajustado pela ETc diária, mínimo",seco,0.256422,—
+p_ajustado_max,"p ajustado pela ETc diária, máximo",chuvoso,0.463482,—
+p_ajustado_max,"p ajustado pela ETc diária, máximo",seco,0.378517,—
+et0_negativa_horas,Horas com ET0 horária negativa (zerada),chuvoso,694,h
+et0_negativa_horas,Horas com ET0 horária negativa (zerada),seco,706,h
+et0_negativa_soma_mm,Soma da ET0 negativa zerada,chuvoso,-8.231792,mm
+et0_negativa_soma_mm,Soma da ET0 negativa zerada,seco,-14.160616,mm
+et0_pm_mm,"ΣET0 PM adotada (ω₁, ω₂ limitados a ±ωs)",chuvoso,278.956281,mm
+et0_pm_mm,"ΣET0 PM adotada (ω₁, ω₂ limitados a ±ωs)",seco,358.463701,mm
+et0_pm_ra_pelo_meio_mm,ΣET0 PM com Ra zerada pelo meio da hora (texto do FAO-56),chuvoso,278.395320,mm
+et0_pm_ra_pelo_meio_mm,ΣET0 PM com Ra zerada pelo meio da hora (texto do FAO-56),seco,357.915529,mm
+rs_rso_bruta_max_ciclo,"Rs/Rso bruta máxima (horas com Ra > 1,5 MJ m⁻² h⁻¹)",chuvoso,1.056758,—
+rs_rso_bruta_max_ciclo,"Rs/Rso bruta máxima (horas com Ra > 1,5 MJ m⁻² h⁻¹)",seco,1.056538,—
+rs_rso_bruta_p99_ciclo,"Rs/Rso bruta, percentil 99 (mesmas horas)",chuvoso,1.028270,—
+rs_rso_bruta_p99_ciclo,"Rs/Rso bruta, percentil 99 (mesmas horas)",seco,1.011226,—
+rs_rso_ano_maximo,"Rs/Rso bruta máxima no ano (Ra > 1,5 MJ m⁻² h⁻¹)",ano_2023,1.108876,—
+rs_rso_ano_p99,"Rs/Rso bruta, percentil 99 no ano",ano_2023,1.021259,—
+rs_rso_ano_n_horas,"Horas do ano com Ra > 1,5 MJ m⁻² h⁻¹",ano_2023,3165,h
+rs_rso_ano_acima_de_1,"Dessas horas, com Rs/Rso bruta > 1 (limitadas a 1)",ano_2023,100,h

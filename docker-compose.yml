@@ -1,0 +1,21 @@
+# Sobe o painel e a API. Antes: copie .env.example para .env e defina DEVICE_TOKEN.
+#   docker compose up --build
+# O banco fica no volume "dados" e sobrevive a recriações do contêiner.
+services:
+  painel:
+    build: .
+    image: pic-fapema-irrigacao:v2
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      PORT: "8000"
+      HOST: "0.0.0.0"
+      DB_PATH: /dados/irrigacao.db
+      DEVICE_TOKEN: ${DEVICE_TOKEN:?defina DEVICE_TOKEN no arquivo .env (veja .env.example)}
+      CORS_ORIGIN: ${CORS_ORIGIN:-}
+    volumes:
+      - dados:/dados
+    restart: unless-stopped
+
+volumes:
+  dados:

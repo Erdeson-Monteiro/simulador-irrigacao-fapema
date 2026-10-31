@@ -1,14 +1,22 @@
 """
 Camada de persistência SQLite — Inicialização do schema, dados de referência,
 ingestão idempotente em lote e consultas (Seções 7 e 8).
+
+O banco roda em modo WAL. O token de cada dispositivo nunca é guardado, só o SHA-256 dele
+(`src/seguranca.py`); a autenticação compara os hashes em tempo constante.
 """
 
 from __future__ import annotations
+from contextlib import contextmanager
 from datetime import datetime, timezone, timedelta
 import json
 import os
 import sqlite3
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, Iterator, List, Optional, Tuple
+
+from src.seguranca import HASH_TOKEN_TESTE_CONTRATO, HASHES_COMPROMETIDOS, hash_token, tokens_conferem
+from src.v2.modelo import NOMES_ESTRATEGIAS
+from src.v2.parametros import PARAMETROS_PADRAO
 
 
 FUSO_BR = timezone(timedelta(hours=-3))
@@ -23,18 +31,61 @@ def agora_iso() -> str:
     return datetime.now(FUSO_BR).isoformat(timespec="seconds")
 
 
+class BancoFormatoAntigo(RuntimeError):
+    """Banco criado pelo v1, com o token do dispositivo em texto puro."""
+
+
 def obter_conexao(db_path: str = DEFAULT_DB_PATH) -> sqlite3.Connection:
-    """Abre conexão SQLite com chaves estrangeiras e row_factory configurados."""
+    """Abre conexão SQLite em modo WAL, com chaves estrangeiras e row_factory configurados."""
     os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=15)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
+    conn.execute("PRAGMA journal_mode = WAL;")
+    conn.execute("PRAGMA busy_timeout = 15000;")
     return conn
 
 
-def inicializar_banco(db_path: str = DEFAULT_DB_PATH) -> None:
-    """Executa o schema SQL e insere os registros base caso ainda não existam."""
-    with obter_conexao(db_path) as conn:
+@contextmanager
+def conexao(db_path: str = DEFAULT_DB_PATH) -> Iterator[sqlite3.Connection]:
+    """Conexão que faz commit ao sair sem erro, rollback com erro, e sempre fecha."""
+    conn = obter_conexao(db_path)
+    try:
+        yield conn
+        conn.commit()
+    except BaseException:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def banco_no_formato_antigo(db_path: str) -> bool:
+    if not os.path.exists(db_path):
+        return False
+    conn = sqlite3.connect(db_path)
+    try:
+        colunas = [r[1] for r in conn.execute("PRAGMA table_info(dispositivo)")]
+    finally:
+        conn.close()
+    return "token" in colunas
+
+
+def inicializar_banco(db_path: str = DEFAULT_DB_PATH, token_dispositivo: Optional[str] = None) -> None:
+    """
+    Executa o schema SQL e insere os registros base caso ainda não existam.
+
+    `token_dispositivo` (o DEVICE_TOKEN do `serve` e do `pipeline`) passa a ser o token do
+    `sim-001`: só o SHA-256 dele é gravado. Sem ele, um `sim-001` recém-criado recebe o hash
+    do token de teste do contrato HTTP (src/seguranca.py), que o `serve` nunca aceita.
+    """
+    if banco_no_formato_antigo(db_path):
+        raise BancoFormatoAntigo(
+            f"{db_path} foi criado pelo v1 e guarda o token em texto puro. Rode python3 main.py pipeline, "
+            "que guarda uma cópia em backups/ e recria o banco."
+        )
+    par = PARAMETROS_PADRAO
+    with conexao(db_path) as conn:
         with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
             conn.executescript(f.read())
 
@@ -82,103 +133,72 @@ def inicializar_banco(db_path: str = DEFAULT_DB_PATH) -> None:
                 cal,
             )
 
-        # 2. Estratégias de acionamento (Seção 4 e Seção 7)
-        estrategias_iniciais = [
-            (
-                1,
-                "E1",
-                "Limiar Fixo",
-                json.dumps({"theta_lim": 0.231, "lamina_fixa_mm": 10.0}),
-            ),
-            (
-                2,
-                "E2",
-                "Balanço Hídrico",
-                json.dumps({"limiar_deficit_mm": 10.0}),
-            ),
-            (
-                3,
-                "E3",
-                "Balanço Hídrico com Restrição de Reservatório",
-                json.dumps(
-                    {
-                        "limiar_deficit_mm": 10.0,
-                        "cenarios": {
-                            "Abundante": {"capacidade_l": 1000.0, "intervalo_dias": 3},
-                            "Moderado": {"capacidade_l": 500.0, "intervalo_dias": 7},
-                            "Restrito": {"capacidade_l": 500.0, "intervalo_dias": 14},
-                        },
-                    }
-                ),
-            ),
+        # 2. Estratégias do modelo v2 (parâmetros lidos da configuração, não digitados)
+        estrategias = [
+            (1, "E1", NOMES_ESTRATEGIAS["E1"].capitalize(),
+             {"regra": "θ₁ ≤ θlim → lâmina fixa L", "theta_lim": par.theta_lim, "lamina_mm": par.lamina_e1_mm}),
+            (2, "E2", NOMES_ESTRATEGIAS["E2"].capitalize(),
+             {"regra": "Dr ≥ RAW → repõe Dr", "raw_mm": par.raw_mm}),
+            (3, "E3", NOMES_ESTRATEGIAS["E3"].capitalize(),
+             {"regra": "Dr ≥ RAW → mín(Dr; B − aplicado no dia), B = (V/A)/n", "raw_mm": par.raw_mm}),
         ]
-        for est in estrategias_iniciais:
+        for est_id, cod, nome, parametros in estrategias:
             conn.execute(
                 """
-                INSERT OR IGNORE INTO estrategia (id, codigo, nome, parametros)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO estrategia (id, codigo, nome, parametros) VALUES (?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET codigo = excluded.codigo, nome = excluded.nome,
+                                              parametros = excluded.parametros
                 """,
-                est,
+                (est_id, cod, nome, json.dumps(parametros, ensure_ascii=False)),
             )
 
-        # 3. Canteiros monitorados (Seção 7)
-        canteiros_iniciais = [
-            (1, "C1", "Canteiro 1 — E1 (Limiar Fixo)", 10.0, "Alface (Hortaliça Folhosa)", 200.0, 200.0, 200.0, 1),
-            (2, "C2", "Canteiro 2 — E2 (Balanço Hídrico)", 10.0, "Alface (Hortaliça Folhosa)", 200.0, 200.0, 200.0, 2),
-            (3, "C3", "Canteiro 3 — E3 (Reservatório Moderado 500L/7d)", 10.0, "Alface (Hortaliça Folhosa)", 200.0, 200.0, 200.0, 3),
-            (4, "C4", "Canteiro 4 — E3 (Reservatório Restrito 500L/14d)", 10.0, "Alface (Hortaliça Folhosa)", 200.0, 200.0, 200.0, 3),
-            (5, "C5", "Canteiro 5 — E3 (Reservatório Abundante 1000L/3d)", 10.0, "Alface (Hortaliça Folhosa)", 200.0, 200.0, 200.0, 3),
+        # 3. Canteiros virtuais do v2: um por estratégia
+        canteiros = [
+            (1, "C1", f"Canteiro virtual 1 — E1 ({NOMES_ESTRATEGIAS['E1']})", 1),
+            (2, "C2", f"Canteiro virtual 2 — E2 ({NOMES_ESTRATEGIAS['E2']})", 2),
+            (3, "C3", f"Canteiro virtual 3 — E3 ({NOMES_ESTRATEGIAS['E3']})", 3),
         ]
-        for c_id, cod, nome, area, cult, prof, v1, v2, est_id in canteiros_iniciais:
+        for c_id, cod, nome, est_id in canteiros:
             conn.execute(
                 """
-                INSERT OR IGNORE INTO canteiro
+                INSERT INTO canteiro
                 (id, codigo, nome, area_m2, cultura, profundidade_raiz_mm, volume_camada_1_mm, volume_camada_2_mm)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET nome = excluded.nome, area_m2 = excluded.area_m2,
+                    profundidade_raiz_mm = excluded.profundidade_raiz_mm,
+                    volume_camada_1_mm = excluded.volume_camada_1_mm, volume_camada_2_mm = excluded.volume_camada_2_mm
                 """,
-                (c_id, cod, nome, area, cult, prof, v1, v2),
+                (c_id, cod, nome, par.area_m2, "Alface", par.z1_mm, par.z1_mm, par.z2_mm),
             )
-            # Vincula histórico em canteiro_estrategia se não existir
-            cur = conn.execute(
-                "SELECT COUNT(*) AS cnt FROM canteiro_estrategia WHERE canteiro_id = ?", (c_id,)
-            )
+            cur = conn.execute("SELECT COUNT(*) AS cnt FROM canteiro_estrategia WHERE canteiro_id = ?", (c_id,))
             if cur.fetchone()["cnt"] == 0:
                 conn.execute(
-                    """
-                    INSERT INTO canteiro_estrategia (canteiro_id, estrategia_id, inicio, fim)
-                    VALUES (?, ?, ?, NULL)
-                    """,
+                    "INSERT INTO canteiro_estrategia (canteiro_id, estrategia_id, inicio, fim) VALUES (?, ?, ?, NULL)",
                     (c_id, est_id, "2026-01-01T00:00:00-03:00"),
                 )
 
-        # 4. Dispositivos emissores (Seção 7 e Seção 12)
-        dispositivos_iniciais = [
-            (
-                1,
-                "sim-001",
-                "Simulador de Balanço Hídrico v1",
-                "simulador",
-                "tok-sim-001-fapema",
-                "2026-01-01T00:00:00-03:00",
-            ),
-            (
-                2,
-                "esp32-001",
-                "Protótipo Microcontrolador Campo v1",
-                "microcontrolador",
-                "tok-esp32-001-fapema",
-                "2026-01-01T00:00:00-03:00",
-            ),
+        # 4. Dispositivos: o simulador e o microcontrolador de campo (desabilitado até ter token)
+        dispositivos = [
+            (1, "sim-001", "Simulador do modelo v2 (canteiros virtuais)", "simulador", HASH_TOKEN_TESTE_CONTRATO),
+            (2, "esp32-001", "Protótipo de microcontrolador de campo", "microcontrolador", None),
         ]
-        for disp in dispositivos_iniciais:
+        for d_id, cod, nome, tipo, hash_inicial in dispositivos:
             conn.execute(
                 """
-                INSERT OR IGNORE INTO dispositivo (id, codigo, nome, tipo, token, criado_em)
+                INSERT OR IGNORE INTO dispositivo (id, codigo, nome, tipo, token_sha256, criado_em)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """,
-                disp,
+                (d_id, cod, nome, tipo, hash_inicial, "2026-01-01T00:00:00-03:00"),
             )
-        conn.commit()
+        if token_dispositivo:
+            conn.execute("UPDATE dispositivo SET token_sha256 = ? WHERE codigo = 'sim-001'",
+                         (hash_token(token_dispositivo),))
+        # Nenhum dispositivo de campo fica com um token comprometido.
+        conn.execute(
+            f"UPDATE dispositivo SET token_sha256 = NULL WHERE tipo = 'microcontrolador' AND token_sha256 IN "
+            f"({','.join('?' * len(HASHES_COMPROMETIDOS))})",
+            tuple(sorted(HASHES_COMPROMETIDOS)),
+        )
 
 
 def autenticar_dispositivo(
@@ -194,10 +214,8 @@ def autenticar_dispositivo(
     row = conn.execute(
         "SELECT * FROM dispositivo WHERE codigo = ?", (codigo_dispositivo,)
     ).fetchone()
-    if not row:
-        raise PermissionError(f"Dispositivo '{codigo_dispositivo}' não cadastrado.")
-    if row["token"] != token:
-        raise PermissionError("Token inválido para o dispositivo informado.")
+    if not row or not tokens_conferem(token, row["token_sha256"]):
+        raise PermissionError("Dispositivo ou token inválido.")
     return row
 
 
@@ -277,7 +295,7 @@ def ingerir_lote_leituras(
     if not codigo_disp or not isinstance(leituras, list):
         raise ValueError("Payload deve conter 'dispositivo' e lista 'leituras'.")
 
-    with obter_conexao(db_path) as conn:
+    with conexao(db_path) as conn:
         disp = autenticar_dispositivo(conn, codigo_disp, auth_header)
         disp_id = int(disp["id"])
         recebido_em = agora_iso()
@@ -352,7 +370,7 @@ def ingerir_lote_eventos_irrigacao(
     if not codigo_disp or not isinstance(eventos, list):
         raise ValueError("Payload deve conter 'dispositivo' e lista 'eventos'.")
 
-    with obter_conexao(db_path) as conn:
+    with conexao(db_path) as conn:
         disp = autenticar_dispositivo(conn, codigo_disp, auth_header)
         disp_id = int(disp["id"])
         recebido_em = agora_iso()
@@ -427,7 +445,7 @@ def ingerir_lote_eventos_irrigacao(
 
 def listar_canteiros(db_path: str = DEFAULT_DB_PATH) -> List[Dict[str, Any]]:
     """Retorna todos os canteiros com sua estratégia ativa e contagens de registros."""
-    with obter_conexao(db_path) as conn:
+    with conexao(db_path) as conn:
         rows = conn.execute(
             """
             SELECT
@@ -461,7 +479,7 @@ def consultar_series_canteiro(
     tipo: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """Consulta `GET /api/v1/canteiros/{id}/series?de=&ate=&tipo=`."""
-    with obter_conexao(db_path) as conn:
+    with conexao(db_path) as conn:
         canteiro_id = _resolver_canteiro_id(conn, canteiro_identificador)
         sql = """
             SELECT
@@ -506,7 +524,7 @@ def consultar_eventos_canteiro(
     ate: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """Consulta `GET /api/v1/canteiros/{id}/eventos?de=&ate=`."""
-    with obter_conexao(db_path) as conn:
+    with conexao(db_path) as conn:
         canteiro_id = _resolver_canteiro_id(conn, canteiro_identificador)
         sql = """
             SELECT
@@ -553,7 +571,7 @@ def exportar_csv_dados(
     Inclui leituras (umidade das 2 camadas, precipitação, temperatura, nível do reservatório)
     e eventos de irrigação com distinção de dispositivo (`simulador` vs `microcontrolador`).
     """
-    with obter_conexao(db_path) as conn:
+    with conexao(db_path) as conn:
         sql = """
             SELECT
                 'leitura' AS categoria_registro,
@@ -645,3 +663,56 @@ def exportar_csv_dados(
         vals = [str(item.get(col, "")) for col in colunas]
         linhas_csv.append(",".join(vals))
     return "\n".join(linhas_csv) + "\n"
+
+
+def limpar_dados_dispositivo(db_path: str, codigo_dispositivo: str) -> Dict[str, int]:
+    """Apaga leituras e eventos de um dispositivo (o simulador antes de repopular o banco)."""
+    with conexao(db_path) as conn:
+        row = conn.execute("SELECT id FROM dispositivo WHERE codigo = ?", (codigo_dispositivo,)).fetchone()
+        if not row:
+            return {"leituras": 0, "eventos": 0}
+        n_l = conn.execute("DELETE FROM leitura WHERE dispositivo_id = ?", (row["id"],)).rowcount
+        n_e = conn.execute("DELETE FROM evento_irrigacao WHERE dispositivo_id = ?", (row["id"],)).rowcount
+    return {"leituras": n_l, "eventos": n_e}
+
+
+def gravar_simulacao(db_path: str, dados: Dict[str, Any]) -> None:
+    campos = ("modelo", "ciclo", "cenario", "capacidade_l", "intervalo_dias", "inicio", "fim")
+    with conexao(db_path) as conn:
+        conn.execute(
+            """
+            INSERT INTO simulacao (id, modelo, ciclo, cenario, capacidade_l, intervalo_dias, inicio, fim,
+                                   parametros, canteiros, metricas, gerado_em)
+            VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET modelo = excluded.modelo, ciclo = excluded.ciclo,
+                cenario = excluded.cenario, capacidade_l = excluded.capacidade_l,
+                intervalo_dias = excluded.intervalo_dias, inicio = excluded.inicio, fim = excluded.fim,
+                parametros = excluded.parametros, canteiros = excluded.canteiros, metricas = excluded.metricas,
+                gerado_em = excluded.gerado_em
+            """,
+            tuple(dados[c] for c in campos) + (
+                json.dumps(dados["parametros"], ensure_ascii=False),
+                json.dumps(dados["canteiros"], ensure_ascii=False),
+                json.dumps(dados["metricas"], ensure_ascii=False),
+                agora_iso(),
+            ),
+        )
+
+
+def ler_simulacao(db_path: str = DEFAULT_DB_PATH) -> Optional[Dict[str, Any]]:
+    with conexao(db_path) as conn:
+        row = conn.execute("SELECT * FROM simulacao WHERE id = 1").fetchone()
+    if not row:
+        return None
+    d = dict(row)
+    for chave in ("parametros", "canteiros", "metricas"):
+        d[chave] = json.loads(d[chave])
+    return d
+
+
+def verificar_banco(db_path: str = DEFAULT_DB_PATH) -> Dict[str, Any]:
+    """Para o GET /healthz: o banco abre e responde."""
+    with conexao(db_path) as conn:
+        modo = conn.execute("PRAGMA journal_mode").fetchone()[0]
+        leituras = conn.execute("SELECT COUNT(*) FROM leitura").fetchone()[0]
+    return {"journal_mode": modo, "leituras": leituras}

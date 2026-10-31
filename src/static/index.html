@@ -1,610 +1,376 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel de Monitoramento e Simulação Hídrica — PIC/FAPEMA</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #1e293b;
-      --panel-alt: #263449;
-      --border: #334155;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --green: #22c55e;
-      --amber: #f59e0b;
-      --red: #ef4444;
-      --purple: #a855f7;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-      padding: 20px 28px 40px;
-    }
-    header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding-bottom: 18px;
-      margin-bottom: 22px;
-      border-bottom: 1px solid var(--border);
-    }
-    .title-group h1 {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: #fff;
-    }
-    .title-group p {
-      font-size: 0.86rem;
-      color: var(--muted);
-    }
-    .controls-bar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-    }
-    label.ctrl {
-      font-size: 0.8rem;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--panel);
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-    }
-    select {
-      background: transparent;
-      color: var(--text);
-      border: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      outline: none;
-      cursor: pointer;
-    }
-    select option {
-      background: var(--panel);
-      color: var(--text);
-    }
-    .btn-export {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--accent);
-      color: #082f49;
-      font-weight: 700;
-      font-size: 0.85rem;
-      padding: 8px 14px;
-      border-radius: 6px;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-    .btn-export:hover { opacity: 0.9; }
-    .badges-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .badge-card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-    }
-    .badge-card .lbl {
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--muted);
-    }
-    .badge-card .val {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-top: 2px;
-    }
-    .badge-card .sub {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 18px 20px;
-      margin-bottom: 20px;
-    }
-    .card-header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .card-header h2 {
-      font-size: 1.02rem;
-      font-weight: 600;
-    }
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-    .legend span {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-    .line-dash {
-      width: 18px;
-      height: 0;
-      border-top: 2px dashed var(--amber);
-      display: inline-block;
-    }
-    .chart-box {
-      width: 100%;
-      overflow-x: auto;
-    }
-    svg.chart {
-      width: 100%;
-      height: 280px;
-      display: block;
-      background: #131d31;
-      border-radius: 6px;
-      border: 1px solid #23324a;
-    }
-    .strategy-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 14px;
-      margin-top: 10px;
-    }
-    .strat-col {
-      background: var(--panel-alt);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-    }
-    .strat-col h3 {
-      font-size: 0.98rem;
-      margin-bottom: 4px;
-      color: var(--accent);
-    }
-    .strat-col .desc {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-    .metric-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      font-size: 0.86rem;
-    }
-    .metric-row:last-child { border-bottom: none; }
-    .metric-row strong { color: #fff; }
-    table.comp-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.84rem;
-      margin-top: 14px;
-    }
-    table.comp-table th, table.comp-table td {
-      padding: 8px 10px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
-    table.comp-table th {
-      color: var(--muted);
-      font-weight: 600;
-      background: rgba(15, 23, 42, 0.45);
-    }
-    .pill-ok {
-      background: rgba(34, 197, 94, 0.16);
-      color: #4ade80;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Simulador de irrigação PIC/FAPEMA</title>
+<style>
+  :root {
+    --fundo: #f5f6f8; --cartao: #ffffff; --borda: #d9dde3; --texto: #1d232b; --suave: #5b6573;
+    --e1: #1F3A5F; --e2: #D9822B; --e3: #555555; --ref: #8a8f96; --destaque: #1F3A5F;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fundo); color: var(--texto);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif; }
+  header { background: var(--cartao); border-bottom: 1px solid var(--borda); padding: 16px 24px 0; }
+  h1 { font-size: 1.3rem; margin: 0; }
+  .sub { color: var(--suave); font-size: 0.9rem; margin: 2px 0 12px; }
+  nav { display: flex; gap: 4px; }
+  nav button { border: 0; background: none; padding: 10px 14px; font: inherit; color: var(--suave);
+               border-bottom: 3px solid transparent; cursor: pointer; }
+  nav button[aria-selected="true"] { color: var(--texto); border-bottom-color: var(--destaque); font-weight: 600; }
+  main { padding: 20px 24px 40px; max-width: 1240px; margin: 0 auto; }
+  section.aba[hidden] { display: none; }
+  .cartoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  .cartao { background: var(--cartao); border: 1px solid var(--borda); border-radius: 8px; padding: 14px 16px; }
+  .cartao h3 { margin: 0 0 8px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+  .cartao .faixa { display: inline-block; width: 22px; height: 0; border-top: 3px solid currentColor; }
+  .metrica { display: flex; justify-content: space-between; font-size: 0.92rem; padding: 2px 0;
+             border-bottom: 1px dashed #eceef1; }
+  .metrica:last-child { border-bottom: 0; }
+  .metrica strong { font-variant-numeric: tabular-nums; }
+  .grafico { background: var(--cartao); border: 1px solid var(--borda); border-radius: 8px; padding: 12px 14px 6px;
+             margin-bottom: 16px; }
+  .grafico h2, .bloco h2 { font-size: 1rem; margin: 0 0 4px; }
+  .grafico p.nota, .bloco p.nota { margin: 0 0 6px; color: var(--suave); font-size: 0.85rem; }
+  .legenda { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.85rem; color: var(--suave); margin: 4px 0; }
+  .legenda span { display: inline-flex; align-items: center; gap: 6px; }
+  svg.serie { width: 100%; height: auto; display: block; }
+  svg text { font-family: inherit; }
+  .bloco { background: var(--cartao); border: 1px solid var(--borda); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+  th, td { padding: 5px 8px; border-bottom: 1px solid #eceef1; text-align: right; white-space: nowrap; }
+  th:first-child, td:first-child, th.e, td.e { text-align: left; }
+  th { color: var(--suave); font-weight: 600; position: sticky; top: 0; background: var(--cartao); }
+  .rolagem { max-height: 260px; overflow: auto; }
+  .tabela-larga { overflow-x: auto; }
+  figure { margin: 0; }
+  figure img { max-width: 100%; height: auto; border: 1px solid var(--borda); background: #fff; }
+  figcaption { font-size: 0.88rem; color: var(--suave); margin-top: 6px; }
+  .aviso { background: #fff7e6; border: 1px solid #f0d199; color: #7a5300; padding: 10px 14px; border-radius: 8px; }
+  .rodape { font-size: 0.82rem; color: var(--suave); margin-top: 6px; }
+  a.botao { display: inline-block; padding: 6px 12px; border: 1px solid var(--borda); border-radius: 6px;
+            text-decoration: none; color: var(--texto); background: var(--cartao); font-size: 0.88rem; }
+</style>
 </head>
 <body>
+<header>
+  <h1>Simulador de irrigação — PIC/FAPEMA (modelo v2)</h1>
+  <p class="sub" id="subtitulo">Carregando a simulação…</p>
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-aba="aba-simulacao">Simulação</button>
+    <button role="tab" aria-selected="false" data-aba="aba-artigo">Resultados do artigo</button>
+  </nav>
+</header>
+<main>
+  <section class="aba" id="aba-simulacao">
+    <div id="aviso" class="aviso" hidden></div>
+    <div class="cartoes" id="cartoes"></div>
 
-  <header>
-    <div class="title-group">
-      <h1>Plataforma de Irrigação Automatizada e Balanço Hídrico — PIC/FAPEMA</h1>
-      <p>Série Climática Real BDMEP/INMET Balsas-MA (Estação A204) · Duas Camadas de Solo (0–20 cm e 20–40 cm) · Simulador &amp; IoT</p>
+    <div class="grafico">
+      <h2>Umidade da camada 1 (θ₁, 0–20 cm), hora a hora</h2>
+      <p class="nota" id="nota-umidade"></p>
+      <div class="legenda" id="legenda-umidade"></div>
+      <svg class="serie" id="graf-umidade" viewBox="0 0 1000 330" role="img" aria-label="Umidade da camada 1"></svg>
     </div>
-    <div class="controls-bar">
-      <label class="ctrl">
-        Canteiro (Série Temporal):
-        <select id="sel-canteiro"></select>
-      </label>
-      <label class="ctrl">
-        Período Climático:
-        <select id="sel-periodo">
-          <option value="Estacao_Seca">Estação Seca (Jul–Set / 70d)</option>
-          <option value="Estacao_Chuvosa">Estação Chuvosa (Jan–Mar / 70d)</option>
-          <option value="Todos">Ambos os Períodos (140d)</option>
-        </select>
-      </label>
-      <label class="ctrl">
-        Cenário Comparativo (E1×E2×E3):
-        <select id="sel-cenario">
-          <option value="Moderado">Moderado (500 L / 7 dias)</option>
-          <option value="Restrito">Restrito (500 L / 14 dias)</option>
-          <option value="Abundante">Abundante (1000 L / 3 dias)</option>
-        </select>
-      </label>
-      <a id="btn-csv" class="btn-export" href="/api/v1/export.csv" download>⬇ Exportar CSV</a>
-    </div>
-  </header>
 
-  <section class="badges-row" id="resumo-topo"></section>
-
-  <!-- Gráfico 1: Série Temporal de Umidade das Duas Camadas + Eventos de Irrigação + Limiar -->
-  <section class="card">
-    <div class="card-header">
-      <h2 id="titulo-grafico-umidade">Série Temporal de Umidade do Solo (Camadas 1 e 2) e Eventos de Irrigação</h2>
-      <div class="legend">
-        <span><i class="dot" style="background:#38bdf8"></i> θ₁ Camada 1 (0–20 cm, Zona Radicular)</span>
-        <span><i class="dot" style="background:#a855f7"></i> θ₂ Camada 2 (20–40 cm, Abaixo da Raiz)</span>
-        <span><i class="line-dash"></i> Limiar de Irrigação (θ_lim = 0,231 cm³/cm³)</span>
-        <span><i class="dot" style="background:#22c55e"></i> Evento de Irrigação (mm)</span>
-      </div>
+    <div class="grafico">
+      <h2>Depleção da zona radicular (Dr)</h2>
+      <p class="nota" id="nota-dr"></p>
+      <div class="legenda" id="legenda-dr"></div>
+      <svg class="serie" id="graf-dr" viewBox="0 0 1000 300" role="img" aria-label="Depleção da zona radicular"></svg>
     </div>
-    <div class="chart-box">
-      <svg id="svg-umidade" class="chart" viewBox="0 0 1000 280" preserveAspectRatio="none"></svg>
+
+    <div class="grafico">
+      <h2>Volume no reservatório</h2>
+      <p class="nota" id="nota-reservatorio"></p>
+      <div class="legenda" id="legenda-reservatorio"></div>
+      <svg class="serie" id="graf-reservatorio" viewBox="0 0 1000 260" role="img" aria-label="Volume no reservatório"></svg>
+    </div>
+
+    <div class="bloco">
+      <h2>Eventos de irrigação</h2>
+      <p class="nota" id="nota-eventos"></p>
+      <div class="rolagem"><table id="tabela-eventos"><thead><tr>
+        <th class="e">Início (hora local)</th><th class="e">Canteiro</th><th class="e">Estratégia</th>
+        <th>Lâmina (mm)</th><th>Volume (L)</th></tr></thead><tbody></tbody></table></div>
+      <p class="rodape"><a class="botao" href="/api/v1/export.csv" download>Exportar leituras e eventos (CSV)</a></p>
     </div>
   </section>
 
-  <!-- Gráfico 2: Nível do Reservatório e Precipitação ao Longo do Tempo -->
-  <section class="card">
-    <div class="card-header">
-      <h2>Nível do Reservatório (L) e Precipitação Diária (mm) ao Longo do Tempo</h2>
-      <div class="legend">
-        <span><i class="dot" style="background:#22c55e"></i> Volume do Reservatório (L)</span>
-        <span><i class="dot" style="background:#60a5fa"></i> Precipitação Diária P (mm)</span>
-      </div>
-    </div>
-    <div class="chart-box">
-      <svg id="svg-reservatorio" class="chart" viewBox="0 0 1000 240" preserveAspectRatio="none"></svg>
-    </div>
+  <section class="aba" id="aba-artigo" hidden>
+    <div class="bloco"><h2>Desempenho das estratégias — ciclo chuvoso (15/01 a 25/03/2023)</h2>
+      <div class="tabela-larga" id="tab-chuvoso"></div></div>
+    <div class="bloco"><h2>Desempenho das estratégias — ciclo seco (01/07 a 08/09/2023)</h2>
+      <div class="tabela-larga" id="tab-seco"></div></div>
+    <div class="bloco"><h2>Capacidade mínima do reservatório para TSE ≥ 90%</h2>
+      <p class="nota">Varredura de 250 a 2.000 L, passo de 250 L.</p>
+      <div class="tabela-larga" id="tab-capacidade"></div></div>
+    <div class="bloco"><figure><img src="/resultados/figuras/figura1_sensibilidade_e1.png" alt="Figura 1" loading="lazy" />
+      <figcaption>Figura 1. Sensibilidade de E1 à lâmina fixa L no cenário abundante: (a) tempo sem estresse hídrico;
+      (b) percolação incremental. Linhas horizontais: E2.</figcaption></figure></div>
+    <div class="bloco"><figure><img src="/resultados/figuras/figura2_seco_restrito.png" alt="Figura 2" loading="lazy" />
+      <figcaption>Figura 2. Ciclo seco, cenário restrito: (a) volume no reservatório; (b) depleção da zona radicular,
+      com RAW e TAW, para E1, E2 e E3.</figcaption></figure></div>
+    <p class="rodape" id="abreviaturas">TSE = tempo sem estresse hídrico (% das horas com Dr ≤ RAW);
+      ETa/ETc = evapotranspiração real/potencial; Dr = depleção da zona radicular; Acion. = acionamentos (horas com irrigação);
+      Perc. incr. = percolação abaixo da zona radicular menos a do sequeiro; Efic. = eficiência incremental;
+      E1 = limiar fixo; E2 = reposição por balanço hídrico; E3 = racionamento uniforme.</p>
   </section>
+</main>
 
-  <!-- Painel Comparativo Lado a Lado das Três Estratégias (Seção 5 e Seção 9) -->
-  <section class="card">
-    <div class="card-header">
-      <h2 id="titulo-comparativo">Comparativo Lado a Lado das Três Estratégias (E1, E2 e E3)</h2>
-      <span class="pill-ok" id="status-validacao">Validação Física (Seção 6): Carregando...</span>
-    </div>
-    <div class="strategy-grid" id="cards-estrategias"></div>
+<script>
+"use strict";
+const ESTILO = {
+  E1: { cor: "#1F3A5F", traco: "", nome: "limiar fixo" },
+  E2: { cor: "#D9822B", traco: "7 4", nome: "reposição por balanço hídrico" },
+  E3: { cor: "#555555", traco: "2 3", nome: "racionamento uniforme" },
+};
+const ESTRATEGIAS = ["E1", "E2", "E3"];
+const COR_LIMIAR = "#9b1c31";   // θlim e RAW: vermelho-escuro, para não confundir com o laranja de E2
 
-    <h2 style="font-size:0.96rem; margin-top:22px; margin-bottom:6px; color:var(--muted);">
-      Matriz Completa dos Experimentos (3 Estratégias × 3 Cenários de Escassez × 2 Regimes Hídricos)
-    </h2>
-    <div style="overflow-x:auto;">
-      <table class="comp-table" id="tabela-completa">
-        <thead>
-          <tr>
-            <th>Período</th>
-            <th>Cenário</th>
-            <th>Estratégia</th>
-            <th>Lâmina Total (mm)</th>
-            <th>Volume Aplicado (L)</th>
-            <th>Percolação ΣD2 (mm / L)</th>
-            <th>Eficiência (%)</th>
-            <th>Conforto Hídrico (%)</th>
-            <th>Acionamentos</th>
-            <th>Déficit Máx. (mm)</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
+function fmt(x, casas = 1) {
+  if (x === null || x === undefined || x === "" || Number.isNaN(Number(x))) return "—";
+  return Number(x).toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas });
+}
+function fmtAuto(x) { return Number(x).toLocaleString("pt-BR", { maximumFractionDigits: 3 }); }
+function el(tag, attrs = {}, filhos = []) {
+  const ns = ["svg", "path", "line", "text", "rect", "g", "polyline"].includes(tag) ? "http://www.w3.org/2000/svg" : null;
+  const e = ns ? document.createElementNS(ns, tag) : document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  for (const f of [].concat(filhos)) e.append(f);
+  return e;
+}
+async function obter(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${url}: ${r.status}`);
+  return r.json();
+}
 
-  <script>
-    const PERIODOS_DATAS = {
-      "Estacao_Seca": { de: "2023-07-01", ate: "2023-09-08" },
-      "Estacao_Chuvosa": { de: "2023-01-15", ate: "2023-03-25" },
-      "Todos": { de: "", ate: "" }
+function abrirAba(id) {
+  document.querySelectorAll("nav button").forEach(x => x.setAttribute("aria-selected", String(x.dataset.aba === id)));
+  document.querySelectorAll("section.aba").forEach(s => { s.hidden = s.id !== id; });
+}
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => {
+  abrirAba(b.dataset.aba);
+  history.replaceState(null, "", b.dataset.aba === "aba-artigo" ? "#artigo" : "#");
+}));
+if (location.hash === "#artigo") abrirAba("aba-artigo");
+
+function amostraLegenda(cor, traco) {
+  return el("svg", { width: 26, height: 10 }, [el("line", { x1: 0, y1: 5, x2: 26, y2: 5, stroke: cor,
+    "stroke-width": 2.5, "stroke-dasharray": traco })]);
+}
+function legenda(id, itens) {
+  const alvo = document.getElementById(id);
+  alvo.replaceChildren(...itens.map(i => el("span", {}, [amostraLegenda(i.cor, i.traco), i.rotulo])));
+}
+
+function escalaBonita(min, max, n = 5) {
+  const passoBruto = (max - min) / n || 1;
+  const pot = Math.pow(10, Math.floor(Math.log10(passoBruto)));
+  const passo = [1, 2, 2.5, 5, 10].map(m => m * pot).find(p => p >= passoBruto) || passoBruto;
+  const ini = Math.floor(min / passo) * passo, fim = Math.ceil(max / passo) * passo;
+  const ticks = [];
+  for (let v = ini; v <= fim + passo / 1e6; v += passo) ticks.push(Number(v.toFixed(10)));
+  return { ini, fim, ticks };
+}
+
+function grafico(svgId, cfg) {
+  const svg = document.getElementById(svgId);
+  const W = 1000, H = Number(svg.getAttribute("viewBox").split(" ")[3]);
+  const m = { e: 70, d: 70, t: 12, b: 44 };
+  const ys = cfg.series.flatMap(s => s.pontos.map(p => p[1])).concat(cfg.refs.map(r => r.y));
+  const xMax = cfg.xMax;
+  const passoX = [1, 7, 14, 28, 56].find(p => xMax / p <= 12) || Math.ceil(xMax / 10);
+  const esc = escalaBonita(cfg.yMin ?? Math.min(...ys), cfg.yMax ?? Math.max(...ys));
+  const X = x => m.e + (x / xMax) * (W - m.e - m.d);
+  const Y = y => H - m.b - ((y - esc.ini) / (esc.fim - esc.ini)) * (H - m.t - m.b);
+  const g = [];
+  for (const t of esc.ticks) {
+    g.push(el("line", { x1: m.e, x2: W - m.d, y1: Y(t), y2: Y(t), stroke: "#eceef1" }));
+    g.push(el("text", { x: m.e - 8, y: Y(t) + 4, "text-anchor": "end", "font-size": 13, fill: "#5b6573" }, cfg.fmtY(t)));
+  }
+  for (let d = 0; d <= xMax + 1e-9; d += passoX) {
+    g.push(el("line", { x1: X(d), x2: X(d), y1: H - m.b, y2: H - m.b + 5, stroke: "#5b6573" }));
+    g.push(el("text", { x: X(d), y: H - m.b + 20, "text-anchor": "middle", "font-size": 13, fill: "#5b6573" }, String(d)));
+  }
+  g.push(el("text", { x: (m.e + W - m.d) / 2, y: H - 6, "text-anchor": "middle", "font-size": 13, fill: "#5b6573" },
+            "Tempo desde o início do ciclo (dias)"));
+  g.push(el("line", { x1: m.e, x2: W - m.d, y1: H - m.b, y2: H - m.b, stroke: "#5b6573" }));
+  for (const r of cfg.refs) {
+    g.push(el("line", { x1: m.e, x2: W - m.d, y1: Y(r.y), y2: Y(r.y), stroke: r.cor || "#8a8f96",
+                        "stroke-dasharray": r.traco || "8 4", "stroke-width": 1.2 }));
+    g.push(el("text", { x: W - m.d + 6, y: Y(r.y) + 4, "font-size": 13, fill: "#333" }, r.rotulo));
+  }
+  for (const s of cfg.series) {
+    const d = s.pontos.map((p, i) => `${i ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join("");
+    g.push(el("path", { d, fill: "none", stroke: s.cor, "stroke-width": 1.4, "stroke-dasharray": s.traco }));
+  }
+  for (const mk of cfg.marcas || []) {
+    g.push(el("line", { x1: X(mk.x), x2: X(mk.x), y1: H - m.b - 4 - mk.nivel * 7, y2: H - m.b - 10 - mk.nivel * 7,
+                        stroke: mk.cor, "stroke-width": 1.6 }));
+  }
+  const cursor = el("line", { y1: m.t, y2: H - m.b, stroke: "#999", "stroke-width": 1, visibility: "hidden" });
+  const caixa = el("text", { x: m.e + 8, y: m.t + 14, "font-size": 13, fill: "#1d232b", visibility: "hidden" });
+  g.push(cursor, caixa);
+  svg.replaceChildren(...g);
+  svg.onmousemove = ev => {
+    const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+    if (loc.x < m.e || loc.x > W - m.d) { cursor.setAttribute("visibility", "hidden"); caixa.setAttribute("visibility", "hidden"); return; }
+    const x = (loc.x - m.e) / (W - m.e - m.d) * xMax;
+    const partes = cfg.series.map(s => {
+      const p = s.pontos.reduce((a, b) => Math.abs(b[0] - x) < Math.abs(a[0] - x) ? b : a, s.pontos[0]);
+      return `${s.rotulo}: ${cfg.fmtY(p[1], true)}`;
+    });
+    cursor.setAttribute("x1", loc.x); cursor.setAttribute("x2", loc.x); cursor.setAttribute("visibility", "visible");
+    caixa.textContent = `dia ${fmt(x, 2)} · ${partes.join(" · ")}`;
+    caixa.setAttribute("visibility", "visible");
+  };
+  svg.onmouseleave = () => { cursor.setAttribute("visibility", "hidden"); caixa.setAttribute("visibility", "hidden"); };
+}
+
+function cartoes(sim) {
+  const alvo = document.getElementById("cartoes");
+  alvo.replaceChildren(...ESTRATEGIAS.map(e => {
+    const m = sim.metricas[e];
+    const linhas = [
+      ["Tempo sem estresse hídrico (TSE)", `${fmt(m.tse_pct)}%`],
+      ["ETa/ETc", `${fmt(m.eta_etc_pct)}%`],
+      ["Lâmina aplicada", `${fmt(m.aplicada_mm)} mm`],
+      ["Percolação incremental", `${fmt(m.percolacao_incremental_mm)} mm`],
+      ["Acionamentos", fmt(m.acionamentos, 0)],
+      ["Dr máximo", `${fmt(m.dr_max_mm)} mm`],
+    ];
+    const titulo = el("h3", { style: `color:${ESTILO[e].cor}` },
+      [el("span", { class: "faixa", style: `border-top-style:${ESTILO[e].traco ? "dashed" : "solid"}` }),
+       `${e} — ${ESTILO[e].nome}`]);
+    return el("div", { class: "cartao" }, [titulo].concat(linhas.map(([k, v]) =>
+      el("div", { class: "metrica" }, [el("span", {}, k), el("strong", {}, v)]))));
+  }));
+}
+
+function tempoDias(iso, inicioCiclo) { return (new Date(iso) - inicioCiclo) / 86400000; }
+
+async function carregarSimulacao() {
+  let sim;
+  try { sim = await obter("/api/v1/simulacao"); }
+  catch (err) {
+    const aviso = document.getElementById("aviso");
+    aviso.hidden = false;
+    aviso.textContent = "O banco ainda não tem uma simulação carregada. Rode: python3 main.py pipeline";
+    document.getElementById("subtitulo").textContent = "Modelo v2 — sem simulação carregada";
+    return;
+  }
+  const p = sim.parametros;
+  const cicloNome = sim.ciclo === "seco" ? "ciclo seco" : "ciclo chuvoso";
+  const dataBr = s => s.split("-").reverse().join("/");
+  document.getElementById("subtitulo").textContent =
+    `Estação A204 do INMET (Balsas-MA) · ${cicloNome}, ${dataBr(sim.inicio)} a ${dataBr(sim.fim)} · cenário ` +
+    `${sim.cenario.toLowerCase()} (${fmt(sim.capacidade_l, 0)} L a cada ${sim.intervalo_dias} dias) · passo horário`;
+  cartoes(sim);
+  const inicioCiclo = new Date(`${sim.inicio}T00:00:00-03:00`);
+  const duracao = (new Date(`${sim.fim}T00:00:00-03:00`) - inicioCiclo) / 86400000 + 1;
+  const noCiclo = pontos => pontos.filter(([t]) => t > 0 && t <= duracao + 1e-9);
+  const porEstrategia = {};
+  await Promise.all(Object.entries(sim.canteiros).map(async ([canteiro, e]) => {
+    const [umid, nivel, ev] = await Promise.all([
+      obter(`/api/v1/canteiros/${canteiro}/series?tipo=umidade_solo`),
+      obter(`/api/v1/canteiros/${canteiro}/series?tipo=nivel_reservatorio`),
+      obter(`/api/v1/canteiros/${canteiro}/eventos`),
+    ]);
+    porEstrategia[e] = {
+      canteiro,
+      theta1: noCiclo(umid.filter(l => l.profundidade_cm === 10).map(l => [tempoDias(l.registrado_em, inicioCiclo), l.valor_calibrado])),
+      volume: noCiclo(nivel.map(l => [tempoDias(l.registrado_em, inicioCiclo), l.valor_calibrado])),
+      eventos: ev.filter(x => { const t = tempoDias(x.inicio, inicioCiclo); return t >= 0 && t < duracao; }),
     };
+  }));
+  const itensLegenda = ESTRATEGIAS.map(e => ({ cor: ESTILO[e].cor, traco: ESTILO[e].traco, rotulo: `${e} (${ESTILO[e].nome})` }));
+  const marcas = ESTRATEGIAS.flatMap((e, nivel) => porEstrategia[e].eventos.map(x =>
+    ({ x: tempoDias(x.inicio, inicioCiclo), cor: ESTILO[e].cor, nivel })));
 
-    const NOMES_ESTRATEGIAS = {
-      "E1": { titulo: "E1 — Limiar Fixo", desc: "Aciona lâmina fixa (10 mm) quando θ₁ < θ_lim (0,231 cm³/cm³)." },
-      "E2": { titulo: "E2 — Balanço Hídrico", desc: "Repõe o déficit acumulado (ETc − P) quando atinge 10 mm." },
-      "E3": { titulo: "E3 — Balanço com Restrição de Reservatório", desc: "Raciona a lâmina pelo volume disponível até o próximo reabastecimento." }
-    };
+  legenda("legenda-umidade", itensLegenda.concat([{ cor: COR_LIMIAR, traco: "10 3 2 3", rotulo: "θlim" },
+                                                     { cor: "#8a8f96", traco: "8 4", rotulo: "θcc e θpmp" }]));
+  document.getElementById("nota-umidade").textContent =
+    `θlim = ${fmtAuto(p.theta_lim)} cm³/cm³ (lido da configuração do modelo; θ₁ = θlim equivale a Dr = RAW). ` +
+    "Os traços curtos na base marcam as horas com irrigação.";
+  grafico("graf-umidade", {
+    series: ESTRATEGIAS.map(e => ({ rotulo: e, cor: ESTILO[e].cor, traco: ESTILO[e].traco, pontos: porEstrategia[e].theta1 })),
+    refs: [{ y: p.theta_cc, rotulo: "θcc" }, { y: p.theta_lim, rotulo: "θlim", cor: COR_LIMIAR, traco: "10 3 2 3" },
+           { y: p.theta_pmp, rotulo: "θpmp" }],
+    yMin: p.theta_pmp - 0.01, yMax: p.theta_cc + 0.005, marcas, xMax: duracao,
+    fmtY: (v, preciso) => preciso ? fmt(v, 3) : fmt(v, 2),
+  });
 
-    let dadosComparativo = null;
-    let listaCanteiros = [];
+  legenda("legenda-dr", itensLegenda.concat([{ cor: COR_LIMIAR, traco: "10 3 2 3", rotulo: "RAW" },
+                                               { cor: "#8a8f96", traco: "8 4", rotulo: "TAW" }]));
+  document.getElementById("nota-dr").textContent =
+    `Dr = (θcc − θ₁)·z₁. Acima de RAW = ${fmt(p.raw_mm)} mm há estresse (Ks < 1); TAW = ${fmt(p.taw_mm)} mm é o ponto de murcha.`;
+  grafico("graf-dr", {
+    series: ESTRATEGIAS.map(e => ({ rotulo: e, cor: ESTILO[e].cor, traco: ESTILO[e].traco,
+      pontos: porEstrategia[e].theta1.map(([t, th]) => [t, (p.theta_cc - th) * p.z1_mm]) })),
+    refs: [{ y: p.raw_mm, rotulo: "RAW", cor: COR_LIMIAR, traco: "10 3 2 3" }, { y: p.taw_mm, rotulo: "TAW" }],
+    yMin: 0, yMax: p.taw_mm * 1.05, xMax: duracao,
+    fmtY: (v, preciso) => preciso ? `${fmt(v, 1)} mm` : fmt(v, 0),
+  });
 
-    async function inicializarPainel() {
-      const [resCanteiros, resComp] = await Promise.all([
-        fetch("/api/v1/canteiros").then(r => r.json()),
-        fetch("/api/v1/comparativo").then(r => r.json())
-      ]);
-      listaCanteiros = resCanteiros;
-      dadosComparativo = resComp;
+  legenda("legenda-reservatorio", itensLegenda);
+  document.getElementById("nota-reservatorio").textContent =
+    `Reservatório cheio no início e reposto a cada ${sim.intervalo_dias} dias; área do canteiro ${fmt(p.area_m2, 0)} m² (1 mm = ${fmt(p.area_m2, 0)} L).`;
+  grafico("graf-reservatorio", {
+    series: ESTRATEGIAS.map(e => ({ rotulo: e, cor: ESTILO[e].cor, traco: ESTILO[e].traco, pontos: porEstrategia[e].volume })),
+    refs: [], yMin: 0, yMax: sim.capacidade_l, xMax: duracao,
+    fmtY: (v, preciso) => preciso ? `${fmt(v, 0)} L` : fmt(v, 0),
+  });
 
-      const selCanteiro = document.getElementById("sel-canteiro");
-      selCanteiro.innerHTML = listaCanteiros.map(c =>
-        `<option value="${c.codigo}">${c.codigo} — ${c.nome}</option>`
-      ).join("");
+  const eventos = ESTRATEGIAS.flatMap(e => porEstrategia[e].eventos.map(x => ({ ...x, estrategia: e })))
+    .sort((a, b) => a.inicio.localeCompare(b.inicio));
+  document.getElementById("nota-eventos").textContent = ESTRATEGIAS.map(e =>
+    `${e}: ${porEstrategia[e].eventos.length} acionamentos`).join(" · ");
+  document.querySelector("#tabela-eventos tbody").replaceChildren(...eventos.map(x => el("tr", {}, [
+    el("td", {}, x.inicio.slice(0, 16).replace("T", " ")), el("td", { class: "e" }, x.canteiro),
+    el("td", { class: "e" }, `${x.estrategia} (${ESTILO[x.estrategia].nome})`),
+    el("td", {}, fmt(x.lamina_mm, 1)), el("td", {}, fmt(x.volume_litros, 0)),
+  ])));
+}
 
-      selCanteiro.addEventListener("change", atualizarVisualizacao);
-      document.getElementById("sel-periodo").addEventListener("change", atualizarVisualizacao);
-      document.getElementById("sel-cenario").addEventListener("change", renderizarComparativo);
-
-      renderizarTabelaCompleta();
-      await atualizarVisualizacao();
-    }
-
-    async function atualizarVisualizacao() {
-      const codCanteiro = document.getElementById("sel-canteiro").value || "C1";
-      const periodo = document.getElementById("sel-periodo").value;
-      const filtroDatas = PERIODOS_DATAS[periodo] || { de: "", ate: "" };
-
-      // Atualiza link de exportação CSV com os filtros vigentes
-      const paramsCsv = new URLSearchParams();
-      paramsCsv.set("canteiro", codCanteiro);
-      if (filtroDatas.de) paramsCsv.set("de", filtroDatas.de);
-      if (filtroDatas.ate) paramsCsv.set("ate", filtroDatas.ate);
-      document.getElementById("btn-csv").href = `/api/v1/export.csv?${paramsCsv.toString()}`;
-
-      const qs = new URLSearchParams();
-      if (filtroDatas.de) qs.set("de", filtroDatas.de);
-      if (filtroDatas.ate) qs.set("ate", filtroDatas.ate);
-
-      const [series, eventos] = await Promise.all([
-        fetch(`/api/v1/canteiros/${codCanteiro}/series?${qs.toString()}`).then(r => r.json()),
-        fetch(`/api/v1/canteiros/${codCanteiro}/eventos?${qs.toString()}`).then(r => r.json())
-      ]);
-
-      renderizarResumoTopo(codCanteiro, series, eventos);
-      desenharGraficoUmidade(series, eventos);
-      desenharGraficoReservatorio(series);
-      renderizarComparativo();
-    }
-
-    function renderizarResumoTopo(codCanteiro, series, eventos) {
-      const canteiroObj = listaCanteiros.find(c => c.codigo === codCanteiro) || {};
-      const c1 = series.filter(s => s.tipo === "umidade_solo" && Number(s.profundidade_cm) === 10);
-      const thetaLim = dadosComparativo?.parametros_solo?.theta_lim || 0.231;
-      const diasConforto = c1.filter(x => x.valor_calibrado >= thetaLim - 1e-6).length;
-      const pctConforto = c1.length ? ((diasConforto / c1.length) * 100).toFixed(1) : "0.0";
-      const laminaTotal = eventos.reduce((acc, ev) => acc + Number(ev.lamina_mm || 0), 0).toFixed(1);
-      const volTotal = eventos.reduce((acc, ev) => acc + Number(ev.volume_litros || 0), 0).toFixed(0);
-      const falhasGlobal = dadosComparativo?.qualidade_serie_climatica?.global?.percentual_falhas_global_pct ?? 0;
-
-      document.getElementById("resumo-topo").innerHTML = `
-        <div class="badge-card">
-          <div class="lbl">Canteiro Ativo / Fonte</div>
-          <div class="val">${codCanteiro} (${canteiroObj.estrategia_codigo || "-"})</div>
-          <div class="sub">Dispositivo: ${series[0]?.dispositivo || "sim-001"} (${series[0]?.dispositivo_tipo || "simulador"})</div>
-        </div>
-        <div class="badge-card">
-          <div class="lbl">Conforto Hídrico (θ₁ ≥ θ_lim)</div>
-          <div class="val" style="color:var(--green)">${pctConforto}%</div>
-          <div class="sub">${diasConforto} de ${c1.length} dias com θ₁ ≥ ${thetaLim} cm³/cm³</div>
-        </div>
-        <div class="badge-card">
-          <div class="lbl">Lâmina / Volume Irrigado</div>
-          <div class="val" style="color:var(--accent)">${laminaTotal} mm (${volTotal} L)</div>
-          <div class="sub">${eventos.length} acionamentos registrados no período</div>
-        </div>
-        <div class="badge-card">
-          <div class="lbl">Série INMET Balsas-MA</div>
-          <div class="val">${falhasGlobal}% falhas</div>
-          <div class="sub">Lacunas curtas interpoladas linearmente (Seção 3.5)</div>
-        </div>
-      `;
-    }
-
-    function desenharGraficoUmidade(series, eventos) {
-      const svg = document.getElementById("svg-umidade");
-      const camada1 = series.filter(s => s.tipo === "umidade_solo" && Number(s.profundidade_cm) === 10);
-      const camada2 = series.filter(s => s.tipo === "umidade_solo" && Number(s.profundidade_cm) === 30);
-
-      if (!camada1.length) {
-        svg.innerHTML = `<text x="500" y="140" fill="#94a3b8" text-anchor="middle">Sem leituras para o filtro selecionado</text>`;
-        return;
-      }
-
-      const W = 1000, H = 280;
-      const padL = 58, padR = 45, padT = 22, padB = 34;
-      const plotW = W - padL - padR;
-      const plotH = H - padT - padB;
-
-      const minTheta = 0.12, maxTheta = 0.34;
-      const xPos = (i, n) => padL + (n <= 1 ? 0 : (i / (n - 1)) * plotW);
-      const yTheta = (val) => padT + plotH - ((val - minTheta) / (maxTheta - minTheta)) * plotH;
-
-      // Mapeia datas para índice X
-      const mapaDataIdx = {};
-      camada1.forEach((d, idx) => {
-        mapaDataIdx[d.registrado_em.slice(0, 10)] = idx;
-      });
-
-      let html = "";
-      // Grade horizontal (θ_pmp = 0.14, θ_lim = 0.231, θ_cc = 0.28)
-      const linhasRef = [
-        { v: 0.14, cor: "#ef4444", rotulo: "θ_pmp (0.140)", dash: "3,3" },
-        { v: 0.231, cor: "#f59e0b", rotulo: "θ_lim (0.231)", dash: "6,4" },
-        { v: 0.28, cor: "#64748b", rotulo: "θ_cc (0.280)", dash: "2,4" }
-      ];
-      linhasRef.forEach(ref => {
-        const y = yTheta(ref.v);
-        html += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="${ref.cor}" stroke-width="1.3" stroke-dasharray="${ref.dash}" />`;
-        html += `<text x="${padL - 6}" y="${y + 4}" fill="${ref.cor}" font-size="10.5" text-anchor="end">${ref.v.toFixed(3)}</text>`;
-      });
-
-      // Eventos de irrigação como hastes verticais verdes sobre a série
-      eventos.forEach(ev => {
-        const dt = ev.inicio.slice(0, 10);
-        const idx = mapaDataIdx[dt];
-        if (idx !== undefined) {
-          const x = xPos(idx, camada1.length);
-          const hBarra = Math.min(plotH * 0.45, (Number(ev.lamina_mm) / 15.0) * (plotH * 0.45));
-          const yTopo = padT + plotH - hBarra;
-          html += `<line x1="${x}" y1="${padT + plotH}" x2="${x}" y2="${yTopo}" stroke="#22c55e" stroke-width="3" opacity="0.75" />`;
-          html += `<circle cx="${x}" cy="${yTopo}" r="3.5" fill="#22c55e"><title>Irrigação ${dt}: ${ev.lamina_mm} mm (${ev.volume_litros} L)</title></circle>`;
-        }
-      });
-
-      // Polilinha Camada 2 (20-40 cm)
-      const pts2 = camada2.map((d, i) => `${xPos(i, camada2.length).toFixed(1)},${yTheta(d.valor_calibrado).toFixed(1)}`).join(" ");
-      html += `<polyline fill="none" stroke="#a855f7" stroke-width="2" points="${pts2}" />`;
-
-      // Polilinha Camada 1 (0-20 cm)
-      const pts1 = camada1.map((d, i) => `${xPos(i, camada1.length).toFixed(1)},${yTheta(d.valor_calibrado).toFixed(1)}`).join(" ");
-      html += `<polyline fill="none" stroke="#38bdf8" stroke-width="2.4" points="${pts1}" />`;
-
-      // Rótulos de datas no eixo X
-      const passoRotulo = Math.max(1, Math.floor(camada1.length / 8));
-      for (let i = 0; i < camada1.length; i += passoRotulo) {
-        const x = xPos(i, camada1.length);
-        const dtCurta = camada1[i].registrado_em.slice(5, 10);
-        html += `<text x="${x}" y="${H - 10}" fill="#94a3b8" font-size="10.5" text-anchor="middle">${dtCurta}</text>`;
-      }
-
-      svg.innerHTML = html;
-    }
-
-    function desenharGraficoReservatorio(series) {
-      const svg = document.getElementById("svg-reservatorio");
-      const reserv = series.filter(s => s.tipo === "nivel_reservatorio");
-      const precip = series.filter(s => s.tipo === "precipitacao");
-
-      if (!reserv.length) {
-        svg.innerHTML = `<text x="500" y="120" fill="#94a3b8" text-anchor="middle">Sem dados de reservatório</text>`;
-        return;
-      }
-
-      const W = 1000, H = 240;
-      const padL = 58, padR = 45, padT = 20, padB = 32;
-      const plotW = W - padL - padR;
-      const plotH = H - padT - padB;
-
-      const maxVol = Math.max(550, ...reserv.map(r => r.valor_calibrado));
-      const xPos = (i, n) => padL + (n <= 1 ? 0 : (i / (n - 1)) * plotW);
-      const yVol = (v) => padT + plotH - (v / maxVol) * plotH;
-
-      let html = "";
-      [0, Math.round(maxVol / 2), Math.round(maxVol)].forEach(v => {
-        const y = yVol(v);
-        html += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#23324a" stroke-width="1" />`;
-        html += `<text x="${padL - 6}" y="${y + 4}" fill="#94a3b8" font-size="10.5" text-anchor="end">${v} L</text>`;
-      });
-
-      // Barras azuis para precipitação diária
-      precip.forEach((p, i) => {
-        if (p.valor_calibrado > 0) {
-          const x = xPos(i, precip.length);
-          const hP = Math.min(plotH * 0.7, (p.valor_calibrado / 45.0) * (plotH * 0.7));
-          html += `<rect x="${x - 2.5}" y="${padT + plotH - hP}" width="5" height="${hP}" fill="#60a5fa" opacity="0.65"><title>Chuva ${p.registrado_em.slice(0,10)}: ${p.valor_calibrado} mm</title></rect>`;
-        }
-      });
-
-      // Área preenchida + linha para volume do reservatório
-      const pts = reserv.map((r, i) => `${xPos(i, reserv.length).toFixed(1)},${yVol(r.valor_calibrado).toFixed(1)}`).join(" ");
-      const xIni = xPos(0, reserv.length).toFixed(1);
-      const xFim = xPos(reserv.length - 1, reserv.length).toFixed(1);
-      const yBase = (padT + plotH).toFixed(1);
-      html += `<polygon points="${xIni},${yBase} ${pts} ${xFim},${yBase}" fill="rgba(34, 197, 94, 0.14)" />`;
-      html += `<polyline fill="none" stroke="#22c55e" stroke-width="2.3" points="${pts}" />`;
-
-      const passoRotulo = Math.max(1, Math.floor(reserv.length / 8));
-      for (let i = 0; i < reserv.length; i += passoRotulo) {
-        const x = xPos(i, reserv.length);
-        const dtCurta = reserv[i].registrado_em.slice(5, 10);
-        html += `<text x="${x}" y="${H - 8}" fill="#94a3b8" font-size="10.5" text-anchor="middle">${dtCurta}</text>`;
-      }
-
-      svg.innerHTML = html;
-    }
-
-    function renderizarComparativo() {
-      if (!dadosComparativo) return;
-      const periodo = document.getElementById("sel-periodo").value === "Estacao_Chuvosa"
-        ? "Estacao_Chuvosa"
-        : "Estacao_Seca";
-      const cenario = document.getElementById("sel-cenario").value || "Moderado";
-
-      const v = dadosComparativo.validacao_secao6;
-      const elVal = document.getElementById("status-validacao");
-      if (v && v.aprovado) {
-        elVal.textContent = `✓ Validação Seção 6 Aprovada (Erro Massa: ${v.teste_1_conservacao_massa.erro_relativo_pct.toFixed(4)}% < 0,1%)`;
-      }
-
-      document.getElementById("titulo-comparativo").textContent =
-        `Comparativo Lado a Lado das Três Estratégias — ${periodo.replace("_", " ")} · Cenário ${cenario}`;
-
-      const filtradas = dadosComparativo.metricas_comparativas.filter(
-        m => m.periodo === periodo && m.cenario === cenario
-      );
-
-      document.getElementById("cards-estrategias").innerHTML = filtradas.map(m => {
-        const info = NOMES_ESTRATEGIAS[m.estrategia] || { titulo: m.estrategia, desc: "" };
-        return `
-          <div class="strat-col">
-            <h3>${info.titulo}</h3>
-            <div class="desc">${info.desc}</div>
-            <div class="metric-row"><span>Lâmina Total Aplicada</span><strong>${m.lamina_total_mm.toFixed(1)} mm (${m.volume_total_l.toFixed(0)} L)</strong></div>
-            <div class="metric-row"><span>Percolação Incremental (D2_inc)</span><strong>${m.d2_incremental_mm.toFixed(1)} mm (${m.d2_incremental_l.toFixed(0)} L)</strong></div>
-            <div class="metric-row"><span>Eficiência de Aplicação Incremental</span><strong>${m.eficiencia_incremental_pct.toFixed(1)}%</strong></div>
-            <div class="metric-row"><span>Conforto Hídrico (θ₁ ≥ θ_lim)</span><strong style="color:var(--green)">${m.conforto_hidrico_pct.toFixed(1)}%</strong></div>
-            <div class="metric-row"><span>Número de Acionamentos</span><strong>${m.numero_acionamentos}</strong></div>
-            <div class="metric-row"><span>Déficit Máximo Atingido</span><strong>${m.deficit_maximo_mm.toFixed(1)} mm</strong></div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function renderizarTabelaCompleta() {
-      if (!dadosComparativo) return;
-      const tbody = document.querySelector("#tabela-completa tbody");
-      tbody.innerHTML = dadosComparativo.metricas_comparativas.map(m => `
-        <tr>
-          <td>${m.periodo}</td>
-          <td>${m.cenario}</td>
-          <td><strong>${m.estrategia}</strong></td>
-          <td>${m.lamina_total_mm.toFixed(1)} mm</td>
-          <td>${m.volume_total_l.toFixed(0)} L</td>
-          <td>${m.d2_incremental_mm.toFixed(1)} mm (${m.d2_incremental_l.toFixed(0)} L)</td>
-          <td>${m.eficiencia_incremental_pct.toFixed(1)}%</td>
-          <td>${m.conforto_hidrico_pct.toFixed(1)}%</td>
-          <td>${m.numero_acionamentos}</td>
-          <td>${m.deficit_maximo_mm.toFixed(1)} mm</td>
-        </tr>
-      `).join("");
-    }
-
-    inicializarPainel();
-  </script>
+const COLUNAS_DESEMPENHO = [
+  ["cenario", "Cenário", "texto"], ["estrategia", "Estr.", "texto"], ["aplicada_mm", "Aplicada (mm)", 1],
+  ["acionamentos", "Acion.", 0], ["percolacao_incremental_mm", "Perc. incr. (mm)", 1],
+  ["eficiencia_incremental_pct", "Efic. (%)", 1], ["tse_pct", "TSE (%)", 1], ["eta_etc_pct", "ETa/ETc (%)", 1],
+  ["dr_max_mm", "Dr máx (mm)", 1], ["dias_reservatorio_vazio", "Dias vazio", 0],
+];
+const COLUNAS_CAPACIDADE = [
+  ["ciclo", "Ciclo", "texto"], ["intervalo_dias", "Intervalo (d)", 0], ["estrategia", "Estr.", "texto"],
+  ["capacidade_minima_texto", "Capacidade mínima", "texto"], ["oferta_mm_dia", "Oferta (mm/d)", 1],
+  ["tse_pct", "TSE (%)", 1], ["eta_etc_pct", "ETa/ETc (%)", 1],
+];
+function tabelaHtml(alvoId, dados, colunas) {
+  const cab = el("tr", {}, colunas.map(([, rot, tipo]) => el("th", tipo === "texto" ? { class: "e" } : {}, rot)));
+  const corpo = dados.linhas.map(l => el("tr", {}, colunas.map(([c, , tipo]) => {
+    let v = l[c];
+    if (c === "cenario" && l.estrategia === "Sequeiro") v = "—";
+    if (c === "ciclo") v = v === "seco" ? "Seco" : "Chuvoso";
+    return el("td", tipo === "texto" ? { class: "e" } : {}, tipo === "texto" ? (v || "—") : fmt(v, tipo));
+  })));
+  document.getElementById(alvoId).replaceChildren(el("table", {}, [el("thead", {}, [cab]), el("tbody", {}, corpo)]));
+}
+async function carregarArtigo() {
+  try {
+    const [chuvoso, seco, cap] = await Promise.all([
+      obter("/api/v1/tabelas/tab_desempenho_chuvoso"), obter("/api/v1/tabelas/tab_desempenho_seco"),
+      obter("/api/v1/tabelas/tab_capacidade_minima")]);
+    tabelaHtml("tab-chuvoso", chuvoso, COLUNAS_DESEMPENHO);
+    tabelaHtml("tab-seco", seco, COLUNAS_DESEMPENHO);
+    tabelaHtml("tab-capacidade", cap, COLUNAS_CAPACIDADE);
+  } catch (err) {
+    document.getElementById("tab-chuvoso").textContent = "Resultados do v2 não encontrados. Rode: python3 main.py pipeline";
+  }
+}
+carregarSimulacao();
+carregarArtigo();
+</script>
 </body>
 </html>

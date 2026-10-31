@@ -1,0 +1,14 @@
+.git
+.github
+**/__pycache__
+*.py[cod]
+.venv
+venv
+.env
+data/irrigacao.db*
+backups/
+*.zip
+data/raw/downloads/
+resultados/v1/
+resultados/v2/series/varredura/
+resultados/v2.tmp/

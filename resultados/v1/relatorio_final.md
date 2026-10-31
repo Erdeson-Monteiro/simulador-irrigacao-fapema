@@ -11,7 +11,7 @@
 | **Orientador** | Prof. Alex Rogaleski Marques |
 | **Bolsista** | Erdeson |
 | **Referência no Plano de Trabalho** | Atividade 2.3 — Desenvolvimento do software e integração IoT (out/2026 a fev/2027) |
-| **Data de Geração do Relatório** | 2026-10-17 |
+| **Data de Geração do Relatório** | 2026-10-31 |
 
 ---
 
@@ -34,7 +34,7 @@ DATA DE FUNDACAO:;26/10/07
 
 | Item de Auditoria | Valor Extraído Diretamente do Arquivo Bruto |
 |---|---|
-| **Caminho do arquivo bruto intocado** | `/home/erdeson/projeto-fapema/data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV` |
+| **Caminho do arquivo bruto intocado** | `data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV` |
 | **SHA-256 do arquivo bruto** | `7aa68f3a9a2c09ef19a822490fb5fe957c1e0b37bed7ca6b084e3e38d450b233` |
 | **Tamanho exato em bytes** | `764609 bytes` |
 | **Número total de linhas** | `8769 linhas` (`8` linhas de metadados + `1` linha de cabeçalho + `8760` linhas horárias de dados) |
@@ -74,9 +74,11 @@ Data;Hora UTC;PRECIPITAÇÃO TOTAL, HORÁRIO (mm);PRESSAO ATMOSFERICA AO NIVEL D
 2023/12/31;2300 UTC;0;981,6;981,6;980,5;;25;22,3;26,2;25;23,6;22,3;86;84;85;345;5,3;,7;
 ```
 
-### 2.4 (h) Estatísticas Descritivas por Variável e por Ciclo (Confronto com Normais Climatológicas de Balsas)
+### 2.4 (h) Estatísticas Descritivas por Variável e por Ciclo
 
-Arquivo CSV correspondente: [`data/tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv`](data/tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv)
+Arquivo CSV correspondente: [`tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv`](tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv)
+
+O confronto com a normal climatológica 1991–2020 de Balsas é feito pelo v2 (`resultados/v2/tabelas/tab_normal_climatologica.md`).
 
 | Ciclo | Intervalo de Datas | Variável | Mínimo | Máximo | Média | Desvio-Padrão | Mediana | Soma no Ciclo |
 |---|---|---|---:|---:|---:|---:|---:|---:|
@@ -97,10 +99,10 @@ Arquivo CSV correspondente: [`data/tabelas/T1b_estatisticas_descritivas_por_vari
 
 ## 3. Qualidade e Tratamento do Dado (Tabela T7)
 
-Arquivo CSV correspondente: [`data/tabelas/T7_qualidade_dado_climatico.csv`](data/tabelas/T7_qualidade_dado_climatico.csv)
+Arquivo CSV correspondente: [`tabelas/T7_qualidade_dado_climatico.csv`](tabelas/T7_qualidade_dado_climatico.csv)
 
-- **Critério de seleção do ano civil de 2023:** nos arquivos anuais mais recentes da estação automática `A204 (BALSAS)` disponibilizados pelo INMET (`2024.zip` e `2025.zip`), a estação sofreu interrupções prolongadas de telemetria durante a estação seca (`60` dias inteiros ausentes entre `2024-07-01` e `2024-09-08`, com lacuna contínua de `27` dias; e `100%` de ausência de maio a dezembro de `2025`), o que viola o limite máximo de interpolação (`> 3` dias consecutivos — Parte 1.7). No arquivo oficial de **2023** (`INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV`), a estação operou de forma ininterrupta de `2023-01-01` a `2023-10-24` (as falhas do ano ocorreram apenas entre `2023-10-25` e `2023-12-12`).
-- **Qualidade nos dois ciclos simulados (`Estacao_Chuvosa`: `2023-01-15` a `2023-03-25`; `Estacao_Seca`: `2023-07-01` a `2023-09-08`):** ambos os ciclos de 70 dias possuem **0 dias ausentes** e **0 horas ausentes** (`1.680 / 1.680` registros horários presentes em cada ciclo para todas as variáveis). Não foi necessário interpolar nenhum dia dentro das duas janelas de simulação.
+- **Escolha do ano de 2023:** este relatório do v1 usa só o arquivo de 2023. A completude da estação `A204` em 2024 e 2025 é conferida pelo v2, a partir dos arquivos do INMET (`resultados/v2/tabelas/tab_completude_anos.md`). No arquivo de 2023, os dias inteiros sem dado somam `34` (maior lacuna de `17` dias): 2023-10-26 a 2023-11-11 (17d); 2023-11-16 a 2023-11-25 (10d); 2023-12-05 a 2023-12-11 (7d), todos fora dos ciclos.
+- **Qualidade nos dois ciclos simulados (`Estacao_Chuvosa`: `2023-01-15` a `2023-03-25`; `Estacao_Seca`: `2023-07-01` a `2023-09-08`):** `0` dias ausentes e `0` horas ausentes somando todas as variáveis; registros horários esperados por ciclo: `Estacao_Chuvosa` `1.680`; `Estacao_Seca` `1.680`.
 
 | Escopo | Intervalo de Datas | Variável | Coluna Original BDMEP | Dias Aval. | Dias Ausentes | % Dias Ausentes | Horas Aval. | Horas Ausentes | % Horas Ausentes | Maior Lacuna (dias) | Datas de Cada Lacuna | Tratamento Aplicado |
 |---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
@@ -121,16 +123,16 @@ Arquivo CSV correspondente: [`data/tabelas/T7_qualidade_dado_climatico.csv`](dat
 
 ## 4. Parâmetros e Fontes (Tabela T8)
 
-Arquivo CSV correspondente: [`data/tabelas/T8_parametros_e_fontes.csv`](data/tabelas/T8_parametros_e_fontes.csv)
+Arquivo CSV correspondente: [`tabelas/T8_parametros_e_fontes.csv`](tabelas/T8_parametros_e_fontes.csv)
 
 | Símbolo | Significado | Valor | Unidade | Origem |
 |---|---|---|---|---|
-| `θ_sat` | Umidade volumétrica do solo na saturação | `0.45` | `cm³/cm³` | [FONTE A PREENCHER PELO AUTOR] |
-| `θ_cc` | Umidade volumétrica do solo na capacidade de campo | `0.28` | `cm³/cm³` | [FONTE A PREENCHER PELO AUTOR] |
-| `θ_pmp` | Umidade volumétrica do solo no ponto de murcha permanente | `0.14` | `cm³/cm³` | [FONTE A PREENCHER PELO AUTOR] |
-| `p` | Fração de depleção da água disponível tolerada antes do estresse hídrico | `0.35` | `adimensional` | [FONTE A PREENCHER PELO AUTOR] |
-| `z1` | Espessura da Camada 1 (zona radicular ativa: 0 a 20 cm) | `200` | `mm` | [FONTE A PREENCHER PELO AUTOR] |
-| `z2` | Espessura da Camada 2 (abaixo da zona radicular: 20 a 40 cm) | `200` | `mm` | [FONTE A PREENCHER PELO AUTOR] |
+| `θ_sat` | Umidade volumétrica do solo na saturação | `0.45` | `cm³/cm³` | premissa do modelo; não altera nenhum resultado (a água acima de θ_cc drena no mesmo passo) |
+| `θ_cc` | Umidade volumétrica do solo na capacidade de campo | `0.28` | `cm³/cm³` | FAO-56, Tabela 19 (solo franco: θcc 0,20–0,30), página [A CONFIRMAR PELO AUTOR]; valor dentro da faixa |
+| `θ_pmp` | Umidade volumétrica do solo no ponto de murcha permanente | `0.14` | `cm³/cm³` | FAO-56, Tabela 19 (solo franco: θpmp 0,07–0,17), página [A CONFIRMAR PELO AUTOR]; valor dentro da faixa |
+| `p` | Fração de depleção da água disponível tolerada antes do estresse hídrico | `0.35` | `adimensional` | sem fonte: o FAO-56, Tabela 22, indica p = 0,30 para alface (valor adotado no v2) |
+| `z1` | Espessura da Camada 1 (zona radicular ativa: 0 a 20 cm) | `200` | `mm` | Marouelli et al. (2008), página [A CONFIRMAR PELO AUTOR]; FAO-56, Tabela 22 (profundidade máxima 0,3–0,5 m) |
+| `z2` | Espessura da Camada 2 (abaixo da zona radicular: 20 a 40 cm) | `200` | `mm` | premissa do modelo |
 | `AD` | Capacidade de água disponível na zona radicular | `28.0` | `mm` | derivado: AD = (θ_cc − θ_pmp) × z1 |
 | `θ_lim` | Limiar crítico de umidade volumétrica na Camada 1 para conforto hídrico e disparo da E1 | `0.231` | `cm³/cm³` | derivado: θ_lim = θ_cc − p × (θ_cc − θ_pmp) |
 | `S1_cc` | Lâmina máxima retida na Camada 1 na capacidade de campo | `56.0` | `mm` | derivado: S1_cc = θ_cc × z1 |
@@ -138,18 +140,18 @@ Arquivo CSV correspondente: [`data/tabelas/T8_parametros_e_fontes.csv`](data/tab
 | `S1_pmp` | Armazenamento residual mínimo na Camada 1 no ponto de murcha permanente | `28.0` | `mm` | derivado: S1_pmp = θ_pmp × z1 |
 | `S1_sat` | Armazenamento de saturação por camada | `90.0` | `mm` | derivado: S1_sat = θ_sat × z1 |
 | `Deficit_solo_lim` | Depleção hídrica na Camada 1 correspondente exatamente a θ_lim | `9.80` | `mm` | derivado: Deficit_solo_lim = (θ_cc − θ_lim) × z1 = p × AD |
-| `Kc_ini` | Coeficiente de cultura na fase inicial (dias 1 a 15 do ciclo) | `0.70` | `adimensional` | [FONTE A PREENCHER PELO AUTOR] |
-| `Kc_med` | Coeficiente de cultura na fase intermediária (dias 16 a 55 do ciclo) | `1.00` | `adimensional` | [FONTE A PREENCHER PELO AUTOR] |
-| `Kc_fim` | Coeficiente de cultura na fase final (dias 56 a 70 do ciclo) | `0.95` | `adimensional` | [FONTE A PREENCHER PELO AUTOR] |
-| `lamina_fixa` | Lâmina nominal por acionamento na estratégia E1 (referência e varredura) | `10.0 (varredura: 5, 10, 15, 20, 25, 30)` | `mm` | [FONTE A PREENCHER PELO AUTOR] |
-| `limiar_deficit` | Gatilho de déficit acumulado para acionamento nas estratégias E2 e E3 | `10.0` | `mm` | [FONTE A PREENCHER PELO AUTOR] |
-| `area_canteiro` | Área útil do canteiro monitorado para conversão entre lâmina (mm) e volume (L) | `10.0` | `m²` | [FONTE A PREENCHER PELO AUTOR] |
-| `V_cap (Abundante / Moderado / Restrito)` | Capacidade nominal do reservatório nos cenários padrão (e varredura 250–2000 L) | `1000 / 500 / 500` | `L` | [FONTE A PREENCHER PELO AUTOR] |
-| `Δt_reab (Abundante / Moderado / Restrito)` | Intervalo entre reabastecimentos do reservatório nos cenários padrão | `3 / 7 / 14` | `dias` | [FONTE A PREENCHER PELO AUTOR] |
-| `Gsc` | Constante solar extraterrestre na equação de Ra | `0.0820` | `MJ·m⁻²·min⁻¹` | [FONTE A PREENCHER PELO AUTOR] |
-| `f_conv_Ra` | Fator de conversão de radiação (MJ·m⁻²·dia⁻¹) em equivalente de evaporação (mm·dia⁻¹) | `0.408` | `mm·m²·MJ⁻¹` | [FONTE A PREENCHER PELO AUTOR] |
-| `c_HS, T_offset, exp_HS` | Coeficientes empíricos da equação de ET0 (0,0023; 17,8 °C; expoente térmico 0,5) | `0.0023; 17.8; 0.5` | `°C⁻¹·⁵; °C; adim.` | [FONTE A PREENCHER PELO AUTOR] |
-| `c_dr, c_δ1, c_δ2` | Constantes astronômicas de distância relativa Terra-Sol (0,033) e declinação solar (0,409 rad; 1,39 rad) | `0.033; 0.409; 1.39` | `adim.; rad; rad` | [FONTE A PREENCHER PELO AUTOR] |
+| `Kc_ini` | Coeficiente de cultura na fase inicial (dias 1 a 15 do ciclo) | `0.70` | `adimensional` | valor: FAO-56, Tabela 12 (grupo Small Vegetables); fase em degrau (dias 1 a 15) sem fonte, trocada no v2 pela curva da eq. 66 com as fases da Tabela 11 |
+| `Kc_med` | Coeficiente de cultura na fase intermediária (dias 16 a 55 do ciclo) | `1.00` | `adimensional` | valor: FAO-56, Tabela 12 (alface); fase em degrau (dias 16 a 55) sem fonte, trocada no v2 pela curva da eq. 66 |
+| `Kc_fim` | Coeficiente de cultura na fase final (dias 56 a 70 do ciclo) | `0.95` | `adimensional` | valor: FAO-56, Tabela 12 (alface); fase em degrau (dias 56 a 70) sem fonte, trocada no v2 pela curva da eq. 66 |
+| `lamina_fixa` | Lâmina nominal por acionamento na estratégia E1 (referência e varredura) | `10.0 (varredura: 5, 10, 15, 20, 25, 30)` | `mm` | premissa do modelo |
+| `limiar_deficit` | Gatilho de déficit acumulado para acionamento nas estratégias E2 e E3 | `10.0` | `mm` | premissa do v1; não corresponde a p × AD = 9.80 mm (banda morta); no v2 o gatilho é o RAW calculado |
+| `area_canteiro` | Área útil do canteiro monitorado para conversão entre lâmina (mm) e volume (L) | `10.0` | `m²` | premissa do modelo |
+| `V_cap (Abundante / Moderado / Restrito)` | Capacidade nominal do reservatório nos cenários padrão (e varredura 250–2000 L) | `1000 / 500 / 500` | `L` | premissa de cenário |
+| `Δt_reab (Abundante / Moderado / Restrito)` | Intervalo entre reabastecimentos do reservatório nos cenários padrão | `3 / 7 / 14` | `dias` | premissa de cenário |
+| `Gsc` | Constante solar extraterrestre na equação de Ra | `0.0820` | `MJ·m⁻²·min⁻¹` | FAO-56, eq. 21 |
+| `f_conv_Ra` | Fator de conversão de radiação (MJ·m⁻²·dia⁻¹) em equivalente de evaporação (mm·dia⁻¹) | `0.408` | `mm·m²·MJ⁻¹` | FAO-56, eq. 20 (1/λ) |
+| `c_HS, T_offset, exp_HS` | Coeficientes empíricos da equação de ET0 (0,0023; 17,8 °C; expoente térmico 0,5) | `0.0023; 17.8; 0.5` | `°C⁻¹·⁵; °C; adim.` | Hargreaves e Samani (1985); FAO-56, eq. 52 |
+| `c_dr, c_δ1, c_δ2` | Constantes astronômicas de distância relativa Terra-Sol (0,033) e declinação solar (0,409 rad; 1,39 rad) | `0.033; 0.409; 1.39` | `adim.; rad; rad` | FAO-56, eqs. 23 e 24 |
 | `φ (latitude)` | Latitude geográfica da estação meteorológica usada no cálculo de Ra | `-7.45555555` | `graus decimais` | extraído do arquivo INMET (campo LATITUDE:; do bloco de metadados) |
 | `λ (longitude)` | Longitude geográfica da estação meteorológica | `-46.02749999` | `graus decimais` | extraído do arquivo INMET (campo LONGITUDE:; do bloco de metadados) |
 | `z_est (altitude)` | Altitude geométrica da estação meteorológica | `271.03` | `m` | extraído do arquivo INMET (campo ALTITUDE:; do bloco de metadados) |
@@ -172,7 +174,7 @@ $$ET_0(t) = \max\left(0,0,\; 0,0023 \cdot R_a\,[\text{mm}\cdot\text{dia}^{-1}] \
 $$ET_{c,\text{pot}}(t) = K_c(t) \cdot ET_0(t)$$
 
 ### 5.2 Balanço Hídrico do Solo em Duas Camadas (`passo_balanco_solo`)
-Com armazenamentos iniciais $S_1(t) = \theta_1(t) \cdot z_1$ e $S_2(t) = \theta_2(t) \cdot z_2$, e limites $S_{1,\text{pmp}} = \theta_{\text{pmp}} \cdot z_1 = 28,0\,\text{mm}$ e $S_{1,\text{cc}} = S_{2,\text{cc}} = \theta_{\text{cc}} \cdot z_1 = 56,0\,\text{mm}$:
+Com armazenamentos iniciais $S_1(t) = \theta_1(t) \cdot z_1$ e $S_2(t) = \theta_2(t) \cdot z_2$, e limites $S_{1,\text{pmp}} = \theta_{\text{pmp}} \cdot z_1 = 28,0\,\text{mm}$, $S_{1,\text{cc}} = \theta_{\text{cc}} \cdot z_1 = 56,0\,\text{mm}$ e $S_{2,\text{cc}} = \theta_{\text{cc}} \cdot z_2 = 56,0\,\text{mm}$:
 
 ```python
 agua_extraivel_1      = max(0.0, S1(t) + P(t) + I_efetiva(t) - S1_pmp)
@@ -202,21 +204,21 @@ Para o índice diário $k \in \{0, 1, \dots, 69\}$ (`dia_idx` $= k+1$):
 
 ### 5.4 Apontamento Explícito de Divergências e Detalhamentos em Relação à Especificação Original
 
-| Aspecto | Como consta na especificação original (`projeto-irigaçao.md`) | Como está implementado no código (`src/water_balance.py` e `src/climate.py`) | Justificativa Física / Metodológica |
+| Aspecto | Como consta na especificação original do v1 | Como está implementado no código (`src/water_balance.py` e `src/climate.py`) | Justificativa Física / Metodológica |
 |---|---|---|---|
 | **Limitação de $ET_c$ no ponto de murcha ($\theta_{\text{pmp}}$)** | A Seção 3.3 escreve `armazenamento_prov_1 = θ1(t)·z1 + P(t) + I(t) − ETc(t)` e exige na linha 99 a invariante `θ1 >= θ_pmp`. | Implementado `ETc_real(t) = min(ETc_pot(t), max(0, S1(t) + P(t) + I_efetiva(t) - S1_pmp))`, usando `ETc_real(t)` no balanço de massa. | Sem limitar a extração real à água disponível acima de $\theta_{\text{pmp}}$, um período seco sem irrigação (como o Teste 2 de secagem monotônica ou o contrafactual em sequeiro) faria $\theta_1$ cair abaixo de $\theta_{\text{pmp}}$ ou violaria a conservação de massa. |
 | **Teto de armazenamento por passo diário ($\theta_{\text{cc}}$ vs $\theta_{\text{sat}}$)** | A Seção 3.3 define `D1(t) = max(0, armazenamento_prov_1 − θ_cc·z1)` e declara `θ <= θ_sat` como invariante. | Implementado exatamente conforme a equação de `D1(t)` e `D2(t)`: toda água que excede $\theta_{\text{cc}} \cdot z$ drena no próprio passo diário, de modo que $\theta_1(t+1) \le \theta_{\text{cc}} = 0,28 < \theta_{\text{sat}} = 0,45$. | Em modelo de reservatório de passo diário sem equação cinética de redistribuição, a macro-porosidade entre $\theta_{\text{cc}}$ e $\theta_{\text{sat}}$ drena dentro de 24 h; logo $\theta_{\text{sat}}$ atua como teto invariante nunca ultrapassado. |
 | **Limite físico do reservatório em E1 e E2** | Na Seção 4 original, o reservatório aparecia apenas na subseção da E3. | Na Parte 2 desta rodada final, o limite físico $I_{\text{efetiva}}(t) = \min(I_{\text{desejada}}(t), V(t)/A_{\text{canteiro}})$ foi estendido a **E1, E2 e E3**, permanecendo exclusivo da E3 apenas o racionamento estratégico por `dias_restantes`. | Impede que E1 e E2 apliquem água inexistente quando o reservatório se esgota nos cenários Moderado e Restrito. |
 | **Desconto de $I(t)$ no déficit acumulado da E3** | A Seção 4.3 mostrava `I(t) = min(Deficit(t), lamina_maxima(t))` sem explicitar a linha de atualização de `Deficit(t)` após irrigação parcial. | Implementado `Deficit(t) = max(0.0, Deficit(t) - I_efetiva(t))` na E3 (enquanto na E2, quando acionada, `I_desejada(t) = Deficit(t)` e `Deficit(t) = 0`). | Como a E3 aplica lâmina deficitária ($I(t) < \text{Deficit}(t)$), apenas a fração efetivamente reposta deve ser abatida do déficit acumulado. |
-| **Latitude geográfica $\phi$** | A Seção 3.4 mencionava como exemplo no texto $\phi \approx -7,53^\circ$. | Removido o valor fixo $-7,53^\circ$ do código (Parte 1.5); o cálculo usa exclusivamente a latitude extraída do bloco de metadados do arquivo bruto do INMET ($\phi = -7,45555555^\circ$). | Fidelidade estrita aos metadados oficiais da estação automática `A204 (BALSAS)` do BDMEP/INMET. |
-| **Agregação de série horária do BDMEP para passo diário** | A Seção 3.5 especifica variáveis diárias ($T_{\max}$, $T_{\min}$, $T_{\text{med}}$, $P$). | O arquivo oficial das estações automáticas do INMET fornece 24 registros horários UTC por dia; o parser agrega $P_{\text{dia}} = \sum P_{\text{hora}}$, $T_{\max,\text{dia}} = \max(T_{\max,\text{hora}})$, $T_{\min,\text{dia}} = \min(T_{\min,\text{hora}})$ e $T_{\text{med,dia}} = \overline{T}_{\text{bulbo seco,hora}}$. | Preserva o arquivo bruto oficial do INMET intocado em `data/raw/` e deriva a série diária em `data/processed/`. |
+| **Latitude geográfica $\phi$** | A Seção 3.4 mencionava um valor de exemplo para $\phi$. | Removido o valor fixo do código (Parte 1.5); o cálculo usa exclusivamente a latitude extraída do bloco de metadados do arquivo bruto do INMET ($\phi = -7,45555555^\circ$). | Fidelidade estrita aos metadados oficiais da estação automática `A204 (BALSAS)` do BDMEP/INMET. |
+| **Agregação de série horária do BDMEP para passo diário** | A Seção 3.5 especifica variáveis diárias ($T_{\max}$, $T_{\min}$, $T_{\text{med}}$, $P$). | O arquivo oficial das estações automáticas do INMET fornece 24 registros horários UTC por dia; o parser agrega $P_{\text{dia}} = \sum P_{\text{hora}}$, $T_{\max,\text{dia}} = \max(T_{\max,\text{hora}})$, $T_{\min,\text{dia}} = \min(T_{\min,\text{hora}})$ e $T_{\text{med,dia}} = \overline{T}_{\text{bulbo seco,hora}}$. | Preserva o arquivo bruto oficial do INMET intocado em `data/raw/` e deriva a série diária em `resultados/v1/processed/`. |
 
 ---
 
 ## 6. Testes de Validação Física (Tabela T6)
 
-Arquivo CSV correspondente: [`data/tabelas/T6_testes_validacao_fisica.csv`](data/tabelas/T6_testes_validacao_fisica.csv)  
-Série diária completa dos 3 testes: [`data/rodadas/rodadas_validacao_fisica_diario.csv`](data/rodadas/rodadas_validacao_fisica_diario.csv)
+Arquivo CSV correspondente: [`tabelas/T6_testes_validacao_fisica.csv`](tabelas/T6_testes_validacao_fisica.csv)  
+Série diária completa dos 3 testes: [`rodadas/rodadas_validacao_fisica_diario.csv`](rodadas/rodadas_validacao_fisica_diario.csv)
 
 | Teste | Dias | Condição Inicial | Forçantes | Valor Esperado Literal (Calculado à Mão) | Valor Observado no Simulador | Erro Absoluto | Erro Relativo | Status |
 |---|---:|---|---|---|---|---|---|---|
@@ -228,7 +230,7 @@ Série diária completa dos 3 testes: [`data/rodadas/rodadas_validacao_fisica_di
 
 ## 7. Caracterização Climática dos Dois Ciclos (Tabela T1 e Figura F1)
 
-Arquivo CSV correspondente: [`data/tabelas/T1_caracterizacao_climatica.csv`](data/tabelas/T1_caracterizacao_climatica.csv)
+Arquivo CSV correspondente: [`tabelas/T1_caracterizacao_climatica.csv`](tabelas/T1_caracterizacao_climatica.csv)
 
 | Ciclo | Datas do Ciclo | Dias | $\Sigma P$ (mm) | $\Sigma ET_0$ (mm) | $ET_0$ Média (mm/d) | $\Sigma ET_c$ (mm) | $ET_c$ Média (mm/d) | $T$ Média (°C) | $T_{\max}$ Abs. (°C) | $T_{\min}$ Abs. (°C) | Nº Dias c/ Chuva | Maior Evento de Chuva (mm e data) |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
@@ -243,8 +245,8 @@ Arquivo CSV correspondente: [`data/tabelas/T1_caracterizacao_climatica.csv`](dat
 
 ## 8. Resultados: Comparação Principal (Tabela T2, Figuras F4 e F5)
 
-Arquivo CSV correspondente: [`data/tabelas/T2_comparacao_principal.csv`](data/tabelas/T2_comparacao_principal.csv)  
-Série diária completa: [`data/rodadas/rodadas_comparacao_principal_diario.csv`](data/rodadas/rodadas_comparacao_principal_diario.csv)
+Arquivo CSV correspondente: [`tabelas/T2_comparacao_principal.csv`](tabelas/T2_comparacao_principal.csv)  
+Série diária completa: [`rodadas/rodadas_comparacao_principal_diario.csv`](rodadas/rodadas_comparacao_principal_diario.csv)
 
 ### 8.1 Referência Contrafactual em Sequeiro ($I(t) = 0$)
 
@@ -277,9 +279,9 @@ Série diária completa: [`data/rodadas/rodadas_comparacao_principal_diario.csv`
 | `Estacao_Seca` | `Restrito` | **E3** | 241.67 | **241.67** / 2417 | 0.00 / 0 | 4.06 / 41 | 0.00 / 0 | **4.06** / 41 | **98.32%** | **25.71%** | 64 | 28.00 | 4 | 28 |
 
 ### 8.3 Verificação da Separação entre Cenários da E1 após o Limite Físico de Reservatório (Parte 3.3)
-- **O empate irrestrito entre os três cenários da E1 deixou de ocorrer:**
-  - Na **Estação Seca**, a estratégia `E1 (10 mm)` separa-se drasticamente no cenário **Restrito (`500 L / 14 dias`)**: enquanto em `Abundante` e `Moderado` a `E1` aplica `350,00 mm` (`3.500 L`, `35` acionamentos, `50,00%` de conforto), no cenário `Restrito` a oferta física do reservatório limita a aplicação a **`240,00 mm` (`2.400 L`, `24` acionamentos)**, gerando **`260,00 mm` (`2.600 L`) de lâmina desejada não atendida**, **`36` dias com reservatório vazio** (primeiro esvaziamento no **dia 23** do ciclo) e queda do conforto hídrico para **`27,14%`** (com o solo atingindo o ponto de murcha permanente, déficit máximo de `28,00 mm`). Além disso, entre `Abundante` e `Moderado` na Estação Seca, embora ambos atendam aos `35` acionamentos de `10 mm`, o cenário `Moderado` esvazia o reservatório no **dia 49** (`1` dia com reservatório vazio ao final do 7º ciclo semanal), enquanto `Abundante` nunca esvazia (`0` dias).
-  - Na **Estação Chuvosa**, a `E1 (10 mm)` empata entre `Abundante` e `Moderado` (`190,00 mm` aplicados, `0,00 mm` não atendidos, `72,86%` de conforto, `0` dias de reservatório vazio, pois em nenhuma janela de 7 dias houve mais de 5 acionamentos), mas **separa-se no cenário `Restrito`**: durante o veranico da segunda quinzena do ciclo (`dias 15 a 28`), a `E1` esgota os `500 L` no **dia 27** (`2023-02-10`), acumulando **`7` dias com reservatório vazio**, **`10,00 mm` (`100 L`) de lâmina não atendida** no dia 28 e redução do conforto hídrico de `72,86%` para **`71,43%`**.
+- **E1 (lâmina fixa) nos três cenários, valores da Tabela T2:**
+  - **Estação Chuvosa:** `Abundante`: `190,00 mm` aplicados em `19` acionamentos, `0,00 mm` não atendidos, conforto de `72,86%`, `0` dias com reservatório vazio; `Moderado`: `190,00 mm` aplicados em `19` acionamentos, `0,00 mm` não atendidos, conforto de `72,86%`, `0` dias com reservatório vazio; `Restrito`: `190,00 mm` aplicados em `19` acionamentos, `10,00 mm` não atendidos, conforto de `71,43%`, `7` dias com reservatório vazio, primeiro esvaziamento no dia 27.
+  - **Estação Seca:** `Abundante`: `350,00 mm` aplicados em `35` acionamentos, `0,00 mm` não atendidos, conforto de `50,00%`, `0` dias com reservatório vazio; `Moderado`: `350,00 mm` aplicados em `35` acionamentos, `0,00 mm` não atendidos, conforto de `50,00%`, `1` dias com reservatório vazio, primeiro esvaziamento no dia 49; `Restrito`: `240,00 mm` aplicados em `24` acionamentos, `260,00 mm` não atendidos, conforto de `27,14%`, `36` dias com reservatório vazio, primeiro esvaziamento no dia 23.
 
 ### Figuras F4 e F5
 - Figura F4 (Estação Chuvosa): [`figuras/F4_barras_comparativas_estacao_chuvosa.png`](figuras/F4_barras_comparativas_estacao_chuvosa.png) · Dados: [`figuras/F4_barras_comparativas_estacao_chuvosa.csv`](figuras/F4_barras_comparativas_estacao_chuvosa.csv)
@@ -291,8 +293,8 @@ Série diária completa: [`data/rodadas/rodadas_comparacao_principal_diario.csv`
 
 ## 9. Resultados: Sensibilidade da Lâmina Fixa da E1 (Tabela T3 e Figura F2)
 
-Arquivo CSV correspondente: [`data/tabelas/T3_sensibilidade_e1.csv`](data/tabelas/T3_sensibilidade_e1.csv)  
-Série diária completa: [`data/rodadas/rodadas_sensibilidade_e1_diario.csv`](data/rodadas/rodadas_sensibilidade_e1_diario.csv)
+Arquivo CSV correspondente: [`tabelas/T3_sensibilidade_e1.csv`](tabelas/T3_sensibilidade_e1.csv)  
+Série diária completa: [`rodadas/rodadas_sensibilidade_e1_diario.csv`](rodadas/rodadas_sensibilidade_e1_diario.csv)
 
 | Período | Cenário | `lamina_fixa` (mm) | Lâmina Desejada (mm) | Lâmina Aplicada (mm / L) | Lâmina Não Atendida (mm / L) | `D2_total` (mm) | `D2_chuva` (mm) | `D2_incremental` (mm / L) | Eficiência Incremental (%) | Conforto Hídrico (%) | Nº Acion. | Déficit Máx. (mm) | Dias Reserv. Vazio | 1º Dia Vazio |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -342,7 +344,7 @@ Série diária completa: [`data/rodadas/rodadas_sensibilidade_e1_diario.csv`](da
 ## 10. Resultados: Dimensionamento do Reservatório (Tabelas T4 e T5, Figura F3)
 
 ### 10.1 Tabela T4 — Dimensionamento Mínimo para Conforto Hídrico ≥ 90%
-Arquivo CSV correspondente: [`data/tabelas/T4_dimensionamento_reservatorio.csv`](data/tabelas/T4_dimensionamento_reservatorio.csv)
+Arquivo CSV correspondente: [`tabelas/T4_dimensionamento_reservatorio.csv`](tabelas/T4_dimensionamento_reservatorio.csv)
 
 | Período Climático | Intervalo de Reabastecimento | Demanda `ETc` Média (mm/d) | $\Sigma P$ no Ciclo (mm) | Capacidade Mínima p/ Conforto ≥ 90% (L) | Oferta Máxima na Cap. Mínima (mm/d) | Conforto Obtido (%) | Lâmina Aplicada (mm) | `D2_incremental` (mm) | Eficiência Incremental (%) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -354,8 +356,8 @@ Arquivo CSV correspondente: [`data/tabelas/T4_dimensionamento_reservatorio.csv`]
 | `Estacao_Seca` | **14 dias** | 5.44 | 42.20 | **1000 L** | 7.14 | **95.71%** | 358.62 | 19.93 | 94.44% |
 
 ### 10.2 Tabela T5 — Varredura Completa do Reservatório na E3 (48 Rodadas)
-Arquivo CSV correspondente: [`data/tabelas/T5_varredura_reservatorio.csv`](data/tabelas/T5_varredura_reservatorio.csv)  
-Série diária completa: [`data/rodadas/rodadas_varredura_reservatorio_e3_diario.csv`](data/rodadas/rodadas_varredura_reservatorio_e3_diario.csv)
+Arquivo CSV correspondente: [`tabelas/T5_varredura_reservatorio.csv`](tabelas/T5_varredura_reservatorio.csv)  
+Série diária completa: [`rodadas/rodadas_varredura_reservatorio_e3_diario.csv`](rodadas/rodadas_varredura_reservatorio_e3_diario.csv)
 
 | Período | Intervalo (d) | Capacidade (L) | Oferta Máx. (mm/d) | Atende ≥ 90%? | Conforto Hídrico (%) | Lâmina Aplicada (mm / L) | Lâmina Não Atendida (mm) | `D2_total` (mm) | `D2_chuva` (mm) | `D2_incremental` (mm) | Eficiência Incremental (%) | Nº Acion. | Déficit Máx. (mm) | Dias Reserv. Vazio | 1º Dia Vazio |
 |---|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -417,71 +419,55 @@ Série diária completa: [`data/rodadas/rodadas_varredura_reservatorio_e3_diario
 ## 11. Nota Metodológica sobre a Decomposição da Percolação (`D2_incremental`)
 
 1. **Definição das grandezas:**
-   - `D2_total`: percolação profunda acumulada abaixo da Camada 2 (`20–40 cm`) na rodada com irrigação ativa.
-   - `D2_chuva`: percolação profunda acumulada na simulação contrafactual em sequeiro ($I(t) = 0$ para todo $t$), submetida exatamente à mesma série climática e às mesmas condições iniciais ($\theta_1(0) = \theta_2(0) = \theta_{\text{cc}} = 0,28\,\text{cm}^3/\text{cm}^3$).
-   - `D2_incremental = D2_total − D2_chuva`: acréscimo de percolação profunda observado quando o manejo de irrigação está ativo em comparação ao sequeiro.
+   - `D2_total`: percolação profunda acumulada abaixo da Camada 2 na rodada com irrigação ativa.
+   - `D2_chuva`: percolação profunda acumulada no contrafactual em sequeiro ($I(t) = 0$), com a mesma série climática e as mesmas condições iniciais ($\theta_1(0) = \theta_2(0) = \theta_{\text{cc}} = 0,28$).
+   - `D2_incremental = D2_total − D2_chuva`.
    - `Eficiência de Aplicação Incremental (%) = ((Lâmina Aplicada − D2_incremental) / Lâmina Aplicada) × 100`.
-2. **Limitação metodológica fundamental (interação não separável solo–chuva–irrigação):**
-   - No contrafactual em sequeiro ($I(t) = 0$), a evapotranspiração da cultura depleciona rapidamente a Camada 1 até próximo de $\theta_{\text{pmp}} = 0,14\,\text{cm}^3/\text{cm}^3$, abrindo uma folga de armazenamento de até $AD = 28,0\,\text{mm}$ na zona radicular. Quando ocorrem eventos de chuva moderados a intensos, o solo seco do contrafactual absorve até $28,0\,\text{mm}$ antes de gerar qualquer drenagem $D_1$, resultando em `D2_chuva` reduzido (`88,69 mm` na Estação Chuvosa para $\Sigma P = 299,20\,\text{mm}$, e `0,00 mm` na Estação Seca para $\Sigma P = 42,20\,\text{mm}$).
-   - Nas rodadas irrigadas, o objetivo explícito do controle é manter $\theta_1(t) \ge \theta_{\text{lim}} = 0,231\,\text{cm}^3/\text{cm}^3$, o que restringe a folga de retenção na Camada 1 a no máximo $S_{1,\text{cc}} - \theta_{\text{lim}} z_1 = 9,80\,\text{mm}$ (ou $0,00\,\text{mm}$ imediatamente após uma reposição plena até $\theta_{\text{cc}}$).
-   - Consequentemente, quando chove sobre o solo mantido úmido pela irrigação, a água da chuva que seria retida no solo seco do contrafactual drena através do perfil. Portanto, **`D2_incremental` NÃO representa uma atribuição física limpa à água da irrigação isoladamente, mas sim o efeito combinado de aplicar irrigação E manter o solo permanentemente úmido diante de eventos estocásticos de precipitação**. Essa limitação é intrínseca a qualquer modelo de balanço hídrico sem previsão meteorológica antecipada.
+2. **Limitação metodológica (interação solo–chuva–irrigação):**
+   - No sequeiro, a ETc esgota a Camada 1 até perto de $\theta_{\text{pmp}}$, abrindo até $AD = 28,0\,\text{mm}$ de espaço antes de qualquer drenagem. Valores calculados: `D2_chuva` = `84,39 mm` na Estação Chuvosa, com $\Sigma P = 299,20\,\text{mm}$; `D2_chuva` = `0,00 mm` na Estação Seca, com $\Sigma P = 42,20\,\text{mm}$.
+   - Nas rodadas irrigadas, o controle mantém $\theta_1 \ge \theta_{\text{lim}} = 0,231$, o que limita a folga de retenção na Camada 1 a $S_{1,\text{cc}} - \theta_{\text{lim}} z_1 = 9,80\,\text{mm}$.
+   - Por isso `D2_incremental` não é uma atribuição física limpa à água da irrigação: inclui a chuva que, no solo seco do sequeiro, teria ficado retida.
 
 ---
 
 ## 12. Investigação da Não-Monotonicidade da E3 (Parte 3.2)
 
-### 12.1 Rastreamento do Fenômeno
-- Na rodada anterior (série sintética, intervalo `14d`), observou-se que a capacidade de `750 L` apresentou `100,0%` de conforto hídrico (`0` dias abaixo de $\theta_{\text{lim}}$), enquanto `1000 L` apresentou `98,6%` (`1` dia em `70` abaixo de $\theta_{\text{lim}}$): especificamente no **dia 38** da Estação Seca ($\theta_{1,\text{final}} = 0,230396 < 0,231000$, com $\text{Deficit}(38) = 9,9208\,\text{mm}$) e no **dia 23** da Estação Chuvosa ($\theta_{1,\text{final}} = 0,230619 < 0,231000$, com $\text{Deficit}(23) = 9,8761\,\text{mm}$).
-- Na série **real do BDMEP/INMET de 2023**:
-  - Na **Estação Seca**, a curva de dimensionamento da E3 é **estritamente monotônica não decrescente** em todos os três intervalos (`3d`, `7d` e `14d`): para `14d`, o conforto sobe de `8,57%` (`250 L`) → `25,71%` (`500 L`) → `50,00%` (`750 L`) → `95,71%` (`1000 L`) → `98,57%` (`1250 L`) → `100,00%` (`1500, 1750 e 2000 L`).
-  - Na **Estação Chuvosa** real de 2023, o mesmo fenômeno de `1` dia de diferença (`98,57%` vs `97,14%`, correspondente a `69/70` vs `68/70` dias em conforto) aparece entre `750 L` (`98,57%`) e `1000 L` (`97,14%`) nos intervalos de `7d` e `14d`.
+### 12.1 Casos na série real do INMET de 2023
 
-### 12.2 Comparação Dia a Dia na Série Real de 2023 (`Estacao_Chuvosa`, Intervalo `14d`: `750 L` vs. `1000 L`)
+- `Estacao_Chuvosa`, intervalo `7d`: `750 L` → conforto `98,57%`; `1.000 L` → `97,14%`.
+- `Estacao_Chuvosa`, intervalo `14d`: `750 L` → conforto `98,57%`; `1.000 L` → `97,14%`.
+- `Estacao_Chuvosa`, intervalo `14d`: `1.250 L` → conforto `98,57%`; `1.500 L` → `97,14%`.
 
-| Dia do Ciclo | Data | Cap. `750 L`: $\theta_{1,\text{ini}}$ | Cap. `750 L`: $I(t)$ (mm) | Cap. `750 L`: $\text{Deficit}_{\text{fim}}$ (mm) | Cap. `750 L`: $\theta_{1,\text{fim}}$ | Cap. `1000 L`: $\theta_{1,\text{ini}}$ | Cap. `1000 L`: $I(t)$ (mm) | Cap. `1000 L`: $\text{Deficit}_{\text{fim}}$ (mm) | Cap. `1000 L`: $\theta_{1,\text{fim}}$ |
-|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **3** | `2023-01-17` | 0,247983 | 0,00 | **9,9010** | **0,230495 (< 0,231)** | 0,247983 | 0,00 | **9,9010** | **0,230495 (< 0,231)** |
-| **42** | `2023-02-25` | 0,280000 | 0,00 | 5,0217 | 0,254892 | 0,280000 | 0,00 | 5,0217 | 0,254892 |
-| **43** | `2023-02-26` | 0,254892 | **5,36** | 5,1032 | 0,254484 | 0,254892 | **7,14** | 3,3175 | 0,263413 |
-| **44** | `2023-02-27` | 0,254484 | **5,71** | 4,0470 | 0,259765 | 0,263413 | 0,00 | 8,9793 | 0,235103 |
-| **45** | `2023-02-28` | 0,259765 | 0,00 | **9,2876 (< 9,80)** | **0,233562 (≥ 0,231)** | 0,268455* | 0,00 | **9,8629** | **0,230685 (< 0,231)** |
+### 12.2 Comparação dia a dia (primeiro caso da lista)
 
-*(Nota: em `1000 L`, no dia 43 `V(43)=1000 L` e `dias_restantes=14`, aplicando `7,14 mm`; no dia 44 o déficit atinge `8,98 mm < 10,0 mm`; ou em `7d` aplica no dia 44 deixando resíduo de `4,62 mm` que, somado a `ETc(45) - P(45) = 5,44 - 0,20 = 5,24 mm`, resulta em `Deficit(45) = 9,8629 mm`.)*
+| Dia | Data | 750 L: $I$ (mm) | 750 L: Deficit (mm) | 750 L: $\theta_{1,\text{fim}}$ | 1.000 L: $I$ (mm) | 1.000 L: Deficit (mm) | 1.000 L: $\theta_{1,\text{fim}}$ |
+|---:|---|---:|---:|---:|---:|---:|---:|
+| 52 | `2023-03-07` | 10,25 | 0,0000 | 0,280000 | 0,00 | 9,9278 | 0,230361 |
 
-### 12.3 Causa Matemática Exata: Comportamento Legítimo Decorrente da Banda Morta `[9,80 mm, 10,00 mm)`
-1. **Não se trata de erro de codificação**, mas de uma propriedade matemática exata dos parâmetros nominais da especificação:
-   - Na Seção 3.2, a água disponível na Camada 1 é $AD = (\theta_{\text{cc}} - \theta_{\text{pmp}}) \times z_1 = (0,28 - 0,14) \times 200 = 28,0\,\text{mm}$, e a fração de depleção tolerada é $p = 0,35$.
-   - Portanto, o limiar de conforto hídrico $\theta_{\text{lim}} = \theta_{\text{cc}} - p(\theta_{\text{cc}} - \theta_{\text{pmp}}) = 0,231\,\text{cm}^3/\text{cm}^3$ equivale exatamente a uma depleção hídrica acumulada na Camada 1 de:
-     $$\text{Deficit}_{\text{solo,lim}} = (\theta_{\text{cc}} - \theta_{\text{lim}}) \times z_1 = p \times AD = 0,35 \times 28,0 = 9,80\,\text{mm}$$
-   - Entretanto, na Seção 4, o parâmetro de gatilho das estratégias `E2` e `E3` foi especificado como o valor nominal arredondado **`limiar_deficit = 10,0 mm`** — isto é, **$0,20\,\text{mm}$ acima da depleção crítica $p \times AD = 9,80\,\text{mm}$**.
-2. **Mecanismo da banda morta $[9,80\,\text{mm},\; 10,00\,\text{mm})$:**
-   - Sempre que o déficit acumulado ao final de um dia $t$ cai dentro do intervalo estreito $\text{Deficit}(t) \in (9,80\,\text{mm},\; 10,00\,\text{mm})$, a condição de disparo $\text{Deficit}(t) \ge 10,00\,\text{mm}$ **ainda não é satisfeita** ($I(t) = 0$), mas a umidade final da Camada 1 cai para $\theta_1(t+1) = 0,28 - \text{Deficit}(t)/200 \in (0,2300,\; 0,2310)\,\text{cm}^3/\text{cm}^3$, ficando até $0,001\,\text{cm}^3/\text{cm}^3$ abaixo de $\theta_{\text{lim}} = 0,231\,\text{cm}^3/\text{cm}^3$ por 1 dia.
-   - Quando a capacidade do reservatório na E3 é `750 L`, o teto diário `lamina_maxima(t)` fraciona a reposição em doses menores (`5,36 mm` no dia 43 e `5,71 mm` no dia 44), deslocando a fase do dente-de-serra do déficit acumulado para `9,29 mm` no dia 45 ($< 9,80\,\text{mm}$, mantendo conforto) e `14,73 mm` no dia 46 ($\ge 10,00\,\text{mm}$, disparando irrigação). Com `1000 L` (ou na `E2`), a dose maior aplicada antes deixa o déficit exatamente em `9,8629 mm` no dia 45, caindo dentro da janela $[9,80,\; 10,00)\,\text{mm}$.
-   - Se `limiar_deficit` fosse parametrizado como $p \times AD = 9,80\,\text{mm}$, essa banda morta de $0,20\,\text{mm}$ deixaria de existir. Como `limiar_deficit = 10,0 mm` é parâmetro explícito da especificação, o valor foi mantido intacto e este mecanismo fica integralmente documentado para discussão no artigo.
+### 12.3 Causa: banda morta entre o limiar de conforto e o gatilho
+- No v1, $\theta_{\text{lim}}$ corresponde a uma depleção de $p \times AD = 0,35 \times 28,0 = 9,80\,\text{mm}$, mas E2 e E3 só disparam com `Deficit` ≥ `10,0 mm`.
+- Quando o déficit do fim do dia cai em $[9,80;\ 10,00)\,\text{mm}$, não há irrigação e o dia termina abaixo de $\theta_{\text{lim}}$. Doses menores (capacidade menor na E3) podem deslocar essa fase e evitar a banda, o que explica a não monotonicidade. No v2 o gatilho é o RAW calculado e a banda não existe.
 
 ---
 
 ## 13. Limitações e Anomalias Observadas
 
-Em conformidade com as boas práticas de transparência científica para defesa em arguição, listam-se todas as anomalias numéricas, comportamentos contraintuitivos e limitações estruturais identificados nos dados e nas simulações:
-
-1. **Anomalia de maior percolação profunda com menor lâmina aplicada na `E1 (10 mm)` sob o cenário `Restrito` da Estação Seca (`D2_total = 24,69 mm` em `Restrito` vs. `18,30 mm` em `Abundante`):**
-   - Embora na Estação Seca a `E1 (10 mm)` aplique `110,00 mm` a menos no cenário `Restrito` (`240,00 mm`) do que no `Abundante` (`350,00 mm`), sua percolação profunda total foi `6,39 mm` maior (`24,69 mm` vs `18,30 mm`).
-   - **Causa física exata (sincronismo de fase entre reabastecimento e chuva atípica de fim de agosto de 2023):** no cenário `Restrito`, o solo encontrava-se exaurido em $\theta_{\text{pmp}} = 0,1400\,\text{cm}^3/\text{cm}^3$ quando ocorreu a 5ª recarga quinzenal de `500 L` no **dia 57 (`2023-08-26`)**. Para recuperar a umidade a partir de $0,1400$, a `E1` aplicou `10,0 mm` por quatro dias seguidos (dias 57, 58, 59 e 60), elevando $\theta_1$ para $0,2288\,\text{cm}^3/\text{cm}^3$ na manhã do **dia 61 (`2023-08-30`)** — apenas $0,0022\,\text{cm}^3/\text{cm}^3$ abaixo de $\theta_{\text{lim}} = 0,2310$. Isso fez a `E1 Restrito` disparar sua 5ª irrigação de `10,0 mm` exatamente no dia `2023-08-30`, data em que ocorreu um evento real de chuva na estação seca de Balsas (`8,6 mm` em `2023-08-30` seguido de `27,6 mm` em `2023-08-31`). Já no cenário `Abundante`, como o solo vinha sendo mantido próximo à capacidade de campo, na manhã de `2023-08-30` a umidade era $\theta_1 = 0,2469 \ge 0,2310$, de modo que o controlador **não irrigou** no dia da chuva, absorvendo os `8,6 mm` e percolando `6,39 mm` a menos.
-2. **Perda de 2 dias de conforto hídrico (`97,14%`) na `E2` e na `E3 Abundante` durante a Estação Chuvosa real de 2023:**
-   - Mesmo sem qualquer falta de água no reservatório, `E2` e `E3 Abundante` registraram `68/70` dias em conforto (`97,14%`) na Estação Chuvosa, perdendo conforto nos **dias 3 (`2023-01-17`, $\theta_1 = 0,230495$, $\text{Deficit} = 9,9010\,\text{mm}$)** e **45 (`2023-02-28`, $\theta_1 = 0,230685$, $\text{Deficit} = 9,8629\,\text{mm}$)**. Ambos decorrem exclusivamente da banda morta $[9,80\,\text{mm},\; 10,00\,\text{mm})$ descrita na Seção 12.
-3. **Queda de conforto hídrico na `E1` quando se aumenta a lâmina fixa sob cenários de reservatório restrito (Tabela T3 e Figura F2):**
-   - No cenário `Abundante`, aumentar `lamina_fixa` de `15 mm` para `30 mm` mantém o conforto no platô máximo da E1 (`80,00%` na Chuvosa e `70,00%` na Seca). Porém, no cenário `Restrito`, aumentar `lamina_fixa` de `15 mm` para `25–30 mm` **reduz o conforto hídrico** de `77,14%` para `62,86%` na Estação Chuvosa e de `37,14%` (`20 mm`) para `34,29%` (`25 mm`) na Estação Seca. Isso ocorre porque lâminas altas desperdiçam a capacidade de `500 L` em percolação profunda logo nos dois primeiros acionamentos da quinzena, deixando o reservatório vazio por até `54` dos `70` dias.
-4. **Teto estrutural de conforto hídrico da estratégia `E1` (`80,00%` na Chuvosa e `70,00%` na Seca mesmo com água ilimitada):**
-   - Como a regra da `E1` avalia $\theta_1(t) < \theta_{\text{lim}}$ apenas no início do passo diário e o solo drena no mesmo dia qualquer lâmina acima de $\theta_{\text{cc}} = 0,28$, cada ciclo de secagem requer obrigatoriamente `1` dia em que $\theta_1$ termina abaixo de $\theta_{\text{lim}}$ para armar o gatilho do dia seguinte.
-5. **Desacoplamento ocasional entre o acumulador climático `Deficit(t)` (E2/E3) e o déficit físico real do solo `(θ_cc − θ1)·z1`:**
-   - Na equação da Seção 4.2 (`Deficit(t) = max(0, Deficit(t-1) + ETc(t) - P(t))`), chuvas intensas zeram `Deficit(t)` quando $P(t) \ge \text{Deficit}(t-1) + ET_c(t)$, o que coincide com o retorno do solo a $\theta_{\text{cc}}$. Contudo, sob restrição severa de reservatório (quando o solo seca até $\theta_{\text{pmp}}$ e $ET_{c,\text{real}} < ET_{c,\text{pot}}$), o acumulador climático soma $ET_{c,\text{pot}}$ enquanto o solo físico não perde água abaixo de $\theta_{\text{pmp}}$. Além disso, na `E2` sem sensor de reservatório, quando `Deficit(t) >= 10 mm` e o tanque está vazio, o controlador comanda a abertura e zera seu contador interno sem que a água tenha entrado no solo.
-6. **Simplificações físicas do modelo de duas camadas:**
-   - Ausência de extração radicular na Camada 2 (`20–40 cm`) e ausência de fluxo capilar ascendente entre a Camada 2 e a Camada 1.
-   - Drenagem gravitacional instantânea dentro do passo diário (sem condutividade hidráulica não saturada $K(\theta)$).
-   - Cálculo de $ET_0$ por Hargreaves-Samani (baseado apenas em temperatura e $R_a$), que na região de Balsas-MA pode apresentar desvios em relação a Penman-Monteith FAO-56 em dias de baixa umidade relativa e ventos fortes no período seco.
-7. **Descontinuidade da série da estação `A204 (BALSAS)` nos anos posteriores a 2023:**
-   - Conforme verificado nos arquivos anuais do BDMEP/INMET, a estação automática `A204` apresentou falhas severas de transmissão entre outubro e dezembro de 2023 (`34` dias sem dados), durante todo o período seco de 2024 e a partir de abril de 2025, razão pela qual o ano de 2023 constitui a série real mais recente com cobertura íntegra (`100%` dos registros horários presentes) nas janelas de Estação Chuvosa e Estação Seca.
+1. **Percolação da `E1` no ciclo seco, `Restrito` × `Abundante`:** `D2_total` = `24,69 mm` com `240,00 mm` aplicados (`Restrito`) e `18,30 mm` com `350,00 mm` (`Abundante`).
+   - Dias com percolação na `E1 Restrito` (série diária): dia 61 (`2023-08-30`): I = `10,00 mm`, P = `8,60 mm`, D2 = `2,73 mm`; dia 62 (`2023-08-31`): I = `0,00 mm`, P = `27,60 mm`, D2 = `21,96 mm`.
+2. **Dias sem conforto na `E2` e na `E3` com o cenário `Abundante`** (ver a banda morta da seção 12.3):
+   - `E2`, Estação Chuvosa: dia 3 (`2023-01-17`, $\theta_1$ = 0,230495, Deficit = 9,9010 mm); dia 52 (`2023-03-07`, $\theta_1$ = 0,230361, Deficit = 9,9278 mm).
+   - `E3`, Estação Chuvosa: dia 3 (`2023-01-17`, $\theta_1$ = 0,230495, Deficit = 9,9010 mm); dia 52 (`2023-03-07`, $\theta_1$ = 0,230361, Deficit = 9,9278 mm).
+   - `E2`, Estação Seca: nenhum.
+   - `E3`, Estação Seca: nenhum.
+3. **Lâmina fixa da `E1`:**
+   - Estação Chuvosa: no `Abundante`, o conforto chega ao máximo (`80,00%`) a partir de `20 mm`; no `Restrito`, por lâmina: `5 mm` → `48,57%`; `10 mm` → `71,43%`; `15 mm` → `77,14%`; `20 mm` → `74,29%`; `25 mm` → `62,86%`; `30 mm` → `62,86%`.
+   - Estação Seca: no `Abundante`, o conforto chega ao máximo (`70,00%`) a partir de `20 mm`; no `Restrito`, por lâmina: `5 mm` → `11,43%`; `10 mm` → `27,14%`; `15 mm` → `35,71%`; `20 mm` → `37,14%`; `25 mm` → `34,29%`; `30 mm` → `35,71%`.
+4. **Teto da `E1` com água sobrando:** a regra é avaliada no início do dia e o conforto no fim, então cada ciclo de secagem custa um dia abaixo de $\theta_{\text{lim}}$ (no v2, com passo horário, custa uma hora):
+   - Estação Chuvosa: conforto de `72,86%` = 1 − `19`/`70`.
+   - Estação Seca: conforto de `50,00%` = 1 − `35`/`70`.
+5. **Acumulador `Deficit(t)` × déficit físico do solo:** com o reservatório vazio, o acumulador da `E2` soma a ETc potencial enquanto o solo, perto de $\theta_{\text{pmp}}$, quase não perde água; e a `E2` zera o contador ao comandar uma irrigação mesmo sem água no tanque.
+6. **Simplificações do modelo de duas camadas:** sem extração radicular e sem ascensão capilar na Camada 2; drenagem instantânea no passo diário; ET0 por Hargreaves-Samani, cujo viés em relação a Penman-Monteith é quantificado pelo v2 (`resultados/v2/tabelas/tab_clima_ciclos.md`).
+7. **Anos vizinhos:** a completude da `A204` em 2024 e 2025 não é avaliada por este relatório; ver o v2 (`resultados/v2/tabelas/tab_completude_anos.md`).
 
 ---
 
@@ -494,10 +480,10 @@ Em conformidade com as boas práticas de transparência científica para defesa 
 | **Versão do SQLite (`sqlite3`)** | `3.45.1` |
 | **Versão do `matplotlib`** | `3.11.2` |
 | **Versão do `numpy`** | `2.5.4` |
-| **Hash do commit Git** | `Não aplicável (diretório de trabalho sem repositório Git inicializado / .git ausente)` |
-| **Comando exato para reproduzir todas as rodadas, tabelas, figuras e relatório do zero** | `python3 main.py` |
+| **Hash do commit Git** | `c4dcceac7216ef02179fc90daf005f8ca5918db8` |
+| **Comando exato para reproduzir todas as rodadas, tabelas, figuras e relatório do zero** | `python3 main.py pipeline --modelo v1` |
 | **Comando exato para executar a suíte de testes de validação** | `python3 -m unittest discover -s tests -v` |
-| **Tempo de execução total medido** | `5.780 segundos` |
+| **Tempo de execução total medido** | `5.983 segundos` |
 | **Confirmação sobre aleatoriedade** | Não há aleatoriedade em nenhum componente do projeto. Nenhum gerador pseudoaleatório (random / numpy.random) é importado ou invocado; todas as equações físicas, regras de decisão e agregações são estritamente determinísticas. |
 | **Semente aleatória (`seed`)** | `Não aplicável (modelo 100% determinístico)` |
 
@@ -509,21 +495,21 @@ Em conformidade com as boas práticas de transparência científica para defesa 
 |---|---|---|
 | **Relatório Principal** | [`relatorio_final.md`](relatorio_final.md) | Relatório técnico-científico consolidado (Seções 1 a 15) |
 | **Dado Bruto INMET** | [`data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV`](data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV) | Arquivo bruto oficial do BDMEP/INMET preservado intocado (`764.609 bytes`, `8.769 linhas`, SHA-256 `7aa68f3a9a2c09ef19a822490fb5fe957c1e0b37bed7ca6b084e3e38d450b233`) |
-| **Série Processada** | [`data/processed/inmet_A204_balsas_2023_diario_bruto_agregado.csv`](data/processed/inmet_A204_balsas_2023_diario_bruto_agregado.csv) | Série diária agregada dos 365 dias de 2023 com contagem de horas válidas por variável |
-| **Série Processada** | [`data/processed/inmet_A204_balsas_2023_ciclos_70d_tratados.csv`](data/processed/inmet_A204_balsas_2023_ciclos_70d_tratados.csv) | Série diária tratada dos dois ciclos de 70 dias (`Estacao_Chuvosa` e `Estacao_Seca`) com $ET_0$, $K_c$ e $ET_c$ |
-| **Tabela T1 (CSV)** | [`data/tabelas/T1_caracterizacao_climatica.csv`](data/tabelas/T1_caracterizacao_climatica.csv) | Caracterização climática dos dois ciclos de 70 dias |
-| **Tabela T1b (CSV)** | [`data/tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv`](data/tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv) | Estatísticas descritivas (mínimo, máximo, média, desvio-padrão, mediana, soma) por variável e ciclo |
-| **Tabela T2 (CSV)** | [`data/tabelas/T2_comparacao_principal.csv`](data/tabelas/T2_comparacao_principal.csv) | Comparação principal: 2 períodos × 3 cenários × 3 estratégias |
-| **Tabela T3 (CSV)** | [`data/tabelas/T3_sensibilidade_e1.csv`](data/tabelas/T3_sensibilidade_e1.csv) | Análise de sensibilidade da lâmina fixa da E1 (`5, 10, 15, 20, 25, 30 mm` × 2 períodos × 3 cenários) |
-| **Tabela T4 (CSV)** | [`data/tabelas/T4_dimensionamento_reservatorio.csv`](data/tabelas/T4_dimensionamento_reservatorio.csv) | Dimensionamento mínimo do reservatório para conforto hídrico ≥ 90% |
-| **Tabela T5 (CSV)** | [`data/tabelas/T5_varredura_reservatorio.csv`](data/tabelas/T5_varredura_reservatorio.csv) | Varredura completa do reservatório na E3 (48 rodadas) |
-| **Tabela T6 (CSV)** | [`data/tabelas/T6_testes_validacao_fisica.csv`](data/tabelas/T6_testes_validacao_fisica.csv) | Resultados dos 3 testes obrigatórios de validação física com constantes literais |
-| **Tabela T7 (CSV)** | [`data/tabelas/T7_qualidade_dado_climatico.csv`](data/tabelas/T7_qualidade_dado_climatico.csv) | Qualidade do dado climático por variável e ciclo |
-| **Tabela T8 (CSV)** | [`data/tabelas/T8_parametros_e_fontes.csv`](data/tabelas/T8_parametros_e_fontes.csv) | Tabela completa de parâmetros, valores, unidades e classificação de origem |
-| **Série Diária** | [`data/rodadas/rodadas_comparacao_principal_diario.csv`](data/rodadas/rodadas_comparacao_principal_diario.csv) | Série diária completa das rodadas da comparação principal e contrafactuais (`1.400 registros`) |
-| **Série Diária** | [`data/rodadas/rodadas_sensibilidade_e1_diario.csv`](data/rodadas/rodadas_sensibilidade_e1_diario.csv) | Série diária completa das 36 rodadas de sensibilidade da E1 (`2.520 registros`) |
-| **Série Diária** | [`data/rodadas/rodadas_varredura_reservatorio_e3_diario.csv`](data/rodadas/rodadas_varredura_reservatorio_e3_diario.csv) | Série diária completa das 48 rodadas da varredura de reservatório da E3 (`3.360 registros`) |
-| **Série Diária** | [`data/rodadas/rodadas_validacao_fisica_diario.csv`](data/rodadas/rodadas_validacao_fisica_diario.csv) | Série diária passo a passo dos 3 testes de validação física (`71 registros`) |
+| **Série Processada** | [`processed/inmet_A204_balsas_2023_diario_bruto_agregado.csv`](processed/inmet_A204_balsas_2023_diario_bruto_agregado.csv) | Série diária agregada dos 365 dias do arquivo, com contagem de horas válidas por variável |
+| **Série Processada** | [`processed/inmet_A204_balsas_2023_ciclos_70d_tratados.csv`](processed/inmet_A204_balsas_2023_ciclos_70d_tratados.csv) | Série diária tratada dos dois ciclos de 70 dias (`Estacao_Chuvosa` e `Estacao_Seca`) com $ET_0$, $K_c$ e $ET_c$ |
+| **Tabela T1 (CSV)** | [`tabelas/T1_caracterizacao_climatica.csv`](tabelas/T1_caracterizacao_climatica.csv) | Caracterização climática dos dois ciclos de 70 dias |
+| **Tabela T1b (CSV)** | [`tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv`](tabelas/T1b_estatisticas_descritivas_por_variavel_ciclo.csv) | Estatísticas descritivas (mínimo, máximo, média, desvio-padrão, mediana, soma) por variável e ciclo |
+| **Tabela T2 (CSV)** | [`tabelas/T2_comparacao_principal.csv`](tabelas/T2_comparacao_principal.csv) | Comparação principal: 2 períodos × 3 cenários × 3 estratégias |
+| **Tabela T3 (CSV)** | [`tabelas/T3_sensibilidade_e1.csv`](tabelas/T3_sensibilidade_e1.csv) | Análise de sensibilidade da lâmina fixa da E1 (`5, 10, 15, 20, 25, 30 mm` × 2 períodos × 3 cenários) |
+| **Tabela T4 (CSV)** | [`tabelas/T4_dimensionamento_reservatorio.csv`](tabelas/T4_dimensionamento_reservatorio.csv) | Dimensionamento mínimo do reservatório para conforto hídrico ≥ 90% |
+| **Tabela T5 (CSV)** | [`tabelas/T5_varredura_reservatorio.csv`](tabelas/T5_varredura_reservatorio.csv) | Varredura completa do reservatório na E3 (48 rodadas) |
+| **Tabela T6 (CSV)** | [`tabelas/T6_testes_validacao_fisica.csv`](tabelas/T6_testes_validacao_fisica.csv) | Resultados dos 3 testes obrigatórios de validação física com constantes literais |
+| **Tabela T7 (CSV)** | [`tabelas/T7_qualidade_dado_climatico.csv`](tabelas/T7_qualidade_dado_climatico.csv) | Qualidade do dado climático por variável e ciclo |
+| **Tabela T8 (CSV)** | [`tabelas/T8_parametros_e_fontes.csv`](tabelas/T8_parametros_e_fontes.csv) | Tabela completa de parâmetros, valores, unidades e classificação de origem |
+| **Série Diária** | [`rodadas/rodadas_comparacao_principal_diario.csv`](rodadas/rodadas_comparacao_principal_diario.csv) | Série diária completa das rodadas da comparação principal e contrafactuais (`1.400 registros`) |
+| **Série Diária** | [`rodadas/rodadas_sensibilidade_e1_diario.csv`](rodadas/rodadas_sensibilidade_e1_diario.csv) | Série diária completa das 36 rodadas de sensibilidade da E1 (`2.520 registros`) |
+| **Série Diária** | [`rodadas/rodadas_varredura_reservatorio_e3_diario.csv`](rodadas/rodadas_varredura_reservatorio_e3_diario.csv) | Série diária completa das 48 rodadas da varredura de reservatório da E3 (`3.360 registros`) |
+| **Série Diária** | [`rodadas/rodadas_validacao_fisica_diario.csv`](rodadas/rodadas_validacao_fisica_diario.csv) | Série diária passo a passo dos 3 testes de validação física (`71 registros`) |
 | **Figura F1 (Chuvosa)** | [`figuras/F1_umidade_solo_estacao_chuvosa.png`](figuras/F1_umidade_solo_estacao_chuvosa.png) | PNG 300 dpi + [`figuras/F1_umidade_solo_estacao_chuvosa.csv`](figuras/F1_umidade_solo_estacao_chuvosa.csv) |
 | **Figura F1 (Seca)** | [`figuras/F1_umidade_solo_estacao_seca.png`](figuras/F1_umidade_solo_estacao_seca.png) | PNG 300 dpi + [`figuras/F1_umidade_solo_estacao_seca.csv`](figuras/F1_umidade_solo_estacao_seca.csv) |
 | **Figura F2 (Chuvosa)** | [`figuras/F2_sensibilidade_e1_estacao_chuvosa.png`](figuras/F2_sensibilidade_e1_estacao_chuvosa.png) | PNG 300 dpi + [`figuras/F2_sensibilidade_e1_estacao_chuvosa.csv`](figuras/F2_sensibilidade_e1_estacao_chuvosa.csv) |

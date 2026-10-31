@@ -1,14 +1,29 @@
-# Banco SQLite gerado na execução (guarda o token do dispositivo)
-data/irrigacao.db
-
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
+.venv/
+venv/
 
-# Segredos e cópias locais
+# Segredos e configuração local
 .env
-backups/
 
-# Cópia integral do projeto de 17/10/2026, idêntica ao commit v1-parecer,
-# mas que inclui data/irrigacao.db; fica só no disco
-pacote_artigo_fapema_irrigacao.zip
+# Banco SQLite do painel (e os arquivos -wal e -shm do modo WAL)
+data/irrigacao.db
+data/irrigacao.db-*
+
+# Cópias locais e pacotes de distribuição
+backups/
+/*.zip
+
+# Downloads brutos do INMET (só o arquivo da A204 é extraído para data/raw/)
+data/raw/downloads/
+
+# Séries da varredura do reservatório (144 rodadas, recriadas pelo pipeline)
+resultados/v2/series/varredura/
+# Pasta temporária do pipeline
+resultados/v2.tmp/
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+.DS_Store

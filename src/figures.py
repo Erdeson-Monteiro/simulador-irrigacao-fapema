@@ -16,7 +16,7 @@ import numpy as np
 
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_FIGURES_DIR = os.path.join(ROOT_DIR, "figuras")
+DEFAULT_FIGURES_DIR = os.path.join(ROOT_DIR, "resultados", "v1", "figuras")
 
 
 def _salvar_csv_figura(caminho_csv: str, linhas: List[Dict[str, Any]]) -> str:

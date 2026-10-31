@@ -1,0 +1,2 @@
+# SHA-256 dos arquivos brutos em data/raw (formato do sha256sum). O v2 recusa arquivo fora deste registro.
+7aa68f3a9a2c09ef19a822490fb5fe957c1e0b37bed7ca6b084e3e38d450b233  INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV

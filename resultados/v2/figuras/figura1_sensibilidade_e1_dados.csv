@@ -1,0 +1,19 @@
+# conteudo: dados da figura
+# origem: PIC/FAPEMA, simulador de irrigação v2 (docs/MODELO.md); gerado por python3 main.py pipeline
+# clima: data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV (SHA-256 7aa68f3a9a2c09ef19a822490fb5fe957c1e0b37bed7ca6b084e3e38d450b233); estação A204 BALSAS-MA, lat -7.45555555, lon -46.02749999, alt 271.03 m
+# parametros: theta_cc=0.28; theta_pmp=0.14; theta_sat=0.45; p=0.3; z1_mm=200; z2_mm=200; f_ext2=0; theta1_inicial=0.28; theta2_inicial=0.28; kc_ini=0.7; kc_mid=1; kc_end=0.95; fases_tabela_dias=20/30/15/10; duracao_ciclo_dias=70; lamina_e1_mm=10; area_m2=10; taw_mm=28; raw_mm=8.4; theta_lim=0.238; fases_dias=19/28/14/9; s1_cc_mm=56; s1_pmp_mm=28; s2_cc_mm=56
+ciclo,estrategia,lamina_e1_mm,tse_pct,percolacao_incremental_mm
+chuvoso,E1,5.000000,98.333333,63.082960
+chuvoso,E1,10.000000,98.928571,103.423126
+chuvoso,E1,15.000000,98.928571,193.423126
+chuvoso,E1,20.000000,98.928571,283.423126
+chuvoso,E1,25.000000,98.928571,373.423126
+chuvoso,E1,30.000000,98.928571,463.423126
+chuvoso,E2,,98.869048,88.037838
+seco,E1,5.000000,96.607143,19.130508
+seco,E1,10.000000,98.095238,52.705656
+seco,E1,15.000000,98.095238,212.705656
+seco,E1,20.000000,98.095238,372.705656
+seco,E1,25.000000,98.095238,532.705656
+seco,E1,30.000000,98.095238,692.705656
+seco,E2,,98.035714,19.336938

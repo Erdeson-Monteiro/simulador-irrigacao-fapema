@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  testes:
+    name: Testes e reprodutibilidade
+    # Versão fixa do runner: os SHA-256 dos CSVs dependem da libm do sistema.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Fonte das figuras (Liberation Serif)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fonts-liberation
+
+      - name: Dependências
+        run: pip install -r requirements.txt
+
+      - name: Testes
+        run: python -m unittest discover -s tests -v
+
+      - name: Conferência dos resultados versionados
+        run: python main.py conferir
+
+      - name: Reprodutibilidade (pipeline do zero gera os mesmos CSVs)
+        run: |
+          python main.py pipeline --sem-banco
+          git diff --stat --exit-code -- resultados/v2/CHECKSUMS.txt
+
+  docker:
+    name: Imagem Docker
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build
+        run: docker build --tag pic-fapema-irrigacao:ci .

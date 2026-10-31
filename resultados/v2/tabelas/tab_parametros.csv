@@ -1,0 +1,24 @@
+# conteudo: parâmetros do modelo e fontes
+# origem: PIC/FAPEMA, simulador de irrigação v2 (docs/MODELO.md); gerado por python3 main.py pipeline
+# clima: data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV (SHA-256 7aa68f3a9a2c09ef19a822490fb5fe957c1e0b37bed7ca6b084e3e38d450b233); estação A204 BALSAS-MA, lat -7.45555555, lon -46.02749999, alt 271.03 m
+# parametros: theta_cc=0.28; theta_pmp=0.14; theta_sat=0.45; p=0.3; z1_mm=200; z2_mm=200; f_ext2=0; theta1_inicial=0.28; theta2_inicial=0.28; kc_ini=0.7; kc_mid=1; kc_end=0.95; fases_tabela_dias=20/30/15/10; duracao_ciclo_dias=70; lamina_e1_mm=10; area_m2=10; taw_mm=28; raw_mm=8.4; theta_lim=0.238; fases_dias=19/28/14/9; s1_cc_mm=56; s1_pmp_mm=28; s2_cc_mm=56
+simbolo,significado,valor,unidade,fonte
+θcc,Umidade na capacidade de campo,0.280000,cm³ cm⁻³,"FAO-56, Tabela 19 (solo franco: θcc 0,20–0,30; θpmp 0,07–0,17); página [A CONFIRMAR PELO AUTOR]"
+θpmp,Umidade no ponto de murcha permanente,0.140000,cm³ cm⁻³,"FAO-56, Tabela 19 (solo franco: θcc 0,20–0,30; θpmp 0,07–0,17); página [A CONFIRMAR PELO AUTOR]"
+θsat,Umidade na saturação,0.450000,cm³ cm⁻³,"premissa do modelo, sem efeito nas métricas (teste)"
+p,Fração da TAW esgotável sem estresse,0.300000,—,"FAO-56, Tabela 22 (alface, p = 0,30)"
+z₁,"Espessura da camada 1 (zona radicular efetiva, 0–20 cm)",200.000000,mm,"Marouelli et al. (2008), página [A CONFIRMAR PELO AUTOR]; FAO-56, Tabela 22 (0,3–0,5 m)"
+z₂,Espessura da camada 2 (20–40 cm),200.000000,mm,"premissa do modelo, sem efeito nas métricas (teste)"
+f_ext2,Fração da ETa retirada da camada 2,0.000000,—,premissa do modelo
+"θ₁(0), θ₂(0)",Umidade inicial das camadas (perfil na capacidade de campo),0.280000,cm³ cm⁻³,premissa do modelo
+TAW,"Água disponível total, (θcc − θpmp)·z₁",28.000000,mm,derivado (calculado pelo código)
+RAW,"Água facilmente disponível, p·TAW",8.400000,mm,derivado (calculado pelo código)
+θlim,"Umidade em que Dr = RAW, θcc − p·(θcc − θpmp)",0.238000,cm³ cm⁻³,derivado (calculado pelo código)
+"Kc,ini","Coeficiente de cultura, fase inicial",0.700000,—,"FAO-56, Tabela 12"
+"Kc,mid","Coeficiente de cultura, fase média",1.000000,—,"FAO-56, Tabela 12"
+"Kc,end","Coeficiente de cultura, fim do ciclo",0.950000,—,"FAO-56, Tabela 12"
+Lini/Ldev/Lmid/Llate,Duração das fases do Kc,19/28/14/9,d,"FAO-56, Tabela 11 (alface 20/30/15/10 d), escalonada a 70 d"
+L,Lâmina fixa de E1 (sensibilidade de 5 a 30 mm),10.000000,mm,premissa do modelo
+A,Área do canteiro (1 mm = 10 L),10.000000,m²,premissa do modelo
+V / N,Capacidade e intervalo de reposição dos cenários,1000/3; 500/7; 500/14,L / d,premissa de cenário
+z_u,Altura do anemômetro,10.000000,m,"INMET, NT 001/2011 (mastro de 10 m); anemômetro no topo, premissa"

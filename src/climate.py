@@ -12,7 +12,7 @@ Regras estritas implementadas:
      - Valores ausentes representados como campo vazio '' ou '-9999'.
      - Nomes de coluna em português com unidade embutida.
   3. Preserva o arquivo bruto intocado em `data/raw/` e grava as séries processadas
-     exclusivamente em `data/processed/`.
+     exclusivamente em `resultados/v1/processed/`.
   4. Calcula Ra e ET0 utilizando exclusivamente a latitude extraída do bloco de metadados
      do próprio arquivo bruto do INMET.
 """
@@ -32,7 +32,16 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_RAW_INMET_CSV = os.path.join(
     ROOT_DIR, "data", "raw", "INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV"
 )
-DEFAULT_PROCESSED_DIR = os.path.join(ROOT_DIR, "data", "processed")
+DEFAULT_PROCESSED_DIR = os.path.join(ROOT_DIR, "resultados", "v1", "processed")
+
+
+def _caminho_no_projeto(caminho: str) -> str:
+    """Caminho relativo à raiz do projeto, para os relatórios não dependerem da máquina."""
+    absoluto = os.path.abspath(caminho)
+    if absoluto.startswith(ROOT_DIR + os.sep):
+        return os.path.relpath(absoluto, ROOT_DIR).replace(os.sep, "/")
+    return absoluto
+
 
 CICLOS_PADRAO = {
     "Estacao_Chuvosa": ("2023-01-15", "2023-03-25"),  # 70 dias
@@ -487,7 +496,7 @@ def carregar_e_tratar_serie_climatica(
     valida que todas as datas dos ciclos solicitados existem no arquivo bruto,
     verifica a ausência de lacunas > `max_lacuna_interpolavel` dias (Parte 1.7),
     calcula `ET0` usando a latitude extraída dos metadados do arquivo (Parte 1.5),
-    salva a série tratada em `data/processed/` (Parte 1.3) e retorna todas as
+    salva a série tratada em `resultados/v1/processed/` (Parte 1.3) e retorna todas as
     provas de procedência e estatísticas descritivas (Partes 1.4 e 1.6).
     """
     bruto = ler_arquivo_bruto_bdmep(caminho_csv)
@@ -751,7 +760,7 @@ def carregar_e_tratar_serie_climatica(
             "data_maior_evento_chuva": data_maior_chuva,
         }
 
-    # Salva os arquivos derivados em data/processed/ sem jamais tocar em data/raw/ (Parte 1.3)
+    # Salva os arquivos derivados em resultados/v1/processed/ sem jamais tocar em data/raw/ (Parte 1.3)
     os.makedirs(diretorio_processed, exist_ok=True)
     caminho_proc_anual = os.path.join(
         diretorio_processed, "inmet_A204_balsas_2023_diario_bruto_agregado.csv"
@@ -826,7 +835,7 @@ def carregar_e_tratar_serie_climatica(
             "altitude_m": bruto["metadados_estacao"]["altitude_m"],
             "altitude_verbatim": bruto["metadados_estacao"]["altitude_verbatim"],
             "data_fundacao": bruto["metadados_estacao"]["data_fundacao"],
-            "arquivo_bruto_caminho": bruto["caminho_arquivo_bruto"],
+            "arquivo_bruto_caminho": _caminho_no_projeto(bruto["caminho_arquivo_bruto"]),
             "arquivo_bruto_nome": bruto["nome_arquivo_bruto"],
             "sha256_bruto": bruto["sha256_bruto"],
             "tamanho_bytes": bruto["tamanho_bytes"],

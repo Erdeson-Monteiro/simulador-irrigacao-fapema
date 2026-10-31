@@ -27,12 +27,13 @@ CREATE TABLE IF NOT EXISTS canteiro_estrategia (
     fim TEXT NULL
 );
 
+-- O token do dispositivo nunca é guardado: só o SHA-256 dele. NULL = dispositivo desabilitado.
 CREATE TABLE IF NOT EXISTS dispositivo (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     codigo TEXT UNIQUE NOT NULL,
     nome TEXT NOT NULL,
     tipo TEXT NOT NULL CHECK (tipo IN ('simulador', 'microcontrolador')),
-    token TEXT UNIQUE NOT NULL,
+    token_sha256 TEXT UNIQUE NULL,
     criado_em TEXT NOT NULL
 );
 
@@ -81,3 +82,19 @@ CREATE TABLE IF NOT EXISTS evento_irrigacao (
 );
 
 CREATE INDEX IF NOT EXISTS idx_evento_canteiro_tempo ON evento_irrigacao(canteiro_id, inicio);
+
+-- Simulação do modelo v2 carregada no banco (uma linha): o que o painel mostra.
+CREATE TABLE IF NOT EXISTS simulacao (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    modelo TEXT NOT NULL,
+    ciclo TEXT NOT NULL,
+    cenario TEXT NOT NULL,
+    capacidade_l REAL NOT NULL,
+    intervalo_dias INTEGER NOT NULL,
+    inicio TEXT NOT NULL,
+    fim TEXT NOT NULL,
+    parametros TEXT NOT NULL,  -- JSON (ParametrosModelo.como_dict)
+    canteiros TEXT NOT NULL,   -- JSON: canteiro -> estratégia
+    metricas TEXT NOT NULL,    -- JSON: estratégia -> métricas da rodada
+    gerado_em TEXT NOT NULL
+);

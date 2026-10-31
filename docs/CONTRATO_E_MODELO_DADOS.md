@@ -1,9 +1,11 @@
-# Etapa 1 — Modelo de Dados e Contrato da Interface de Ingestão
+# Modelo de dados e contrato da interface de ingestão
 
 **Projeto:** Automação da Irrigação em Hortas Comunitárias com Sensores e IoT — PIC/FAPEMA  
 **Edital:** COORD.NUPEX nº 01/2026  
 
 Este documento formaliza o modelo relacional de persistência e o contrato HTTP/JSON da interface de ingestão e consulta, garantindo a intercambialidade transparente entre o **simulador** (`tipo = 'simulador'`) e o **microcontrolador físico** (`tipo = 'microcontrolador'`).
+
+**Versão do modelo v2.** O banco é populado por `python3 main.py pipeline` (ou `simular`) com três canteiros virtuais, `C1` (E1, limiar fixo), `C2` (E2, reposição por balanço hídrico) e `C3` (E3, racionamento uniforme), que enviam leituras horárias do modelo v2 por este mesmo contrato. O SQLite roda em modo WAL. O token do dispositivo nunca é guardado: só o SHA-256 dele.
 
 ---
 
@@ -29,7 +31,7 @@ Define a política de acionamento da irrigação.
 | `id` | `INTEGER` | `PRIMARY KEY AUTOINCREMENT` | Identificador interno |
 | `codigo` | `TEXT` | `UNIQUE NOT NULL` | `E1`, `E2` ou `E3` |
 | `nome` | `TEXT` | `NOT NULL` | Nome da estratégia |
-| `parametros` | `TEXT (JSON)` | `NOT NULL` | Parâmetros estruturados em JSON (`theta_lim`, `lamina_fixa_mm`, `limiar_deficit_mm`, `capacidade_reservatorio_l`, `intervalo_reabastecimento_dias`) |
+| `parametros` | `TEXT (JSON)` | `NOT NULL` | Regra e parâmetros em JSON, lidos da configuração do modelo v2 (`regra`; `theta_lim` e `lamina_mm` em E1; `raw_mm` em E2 e E3) |
 
 ### 1.3 `canteiro_estrategia`
 Histórico temporal de vinculação entre canteiro e estratégia vigente.
@@ -49,7 +51,7 @@ Emissor autorizado (simulador ou microcontrolador em campo).
 | `codigo` | `TEXT` | `UNIQUE NOT NULL` | Identificador enviado no payload (ex.: `sim-001`, `esp32-001`) |
 | `nome` | `TEXT` | `NOT NULL` | Descrição do dispositivo |
 | `tipo` | `TEXT` | `CHECK (tipo IN ('simulador', 'microcontrolador'))` | Distingue dado sintético de dado medido em campo |
-| `token` | `TEXT` | `UNIQUE NOT NULL` | Token Bearer de autenticação |
+| `token_sha256` | `TEXT` | `UNIQUE NULL` | SHA-256 do token Bearer (o token em si nunca é guardado); `NULL` = dispositivo desabilitado |
 | `criado_em` | `TEXT (ISO-8601)` | `NOT NULL` | Timestamp de criação |
 
 ### 1.5 `calibracao`
@@ -101,6 +103,9 @@ Registro de acionamentos da irrigação.
 
 - **Restrição de Idempotência:** `UNIQUE(dispositivo_id, sequencia)`
 
+### 1.8 `simulacao`
+Simulação do modelo v2 carregada no banco (uma única linha, `id = 1`), lida pelo painel: `modelo`, `ciclo`, `cenario`, `capacidade_l`, `intervalo_dias`, `inicio`, `fim`, `parametros` (JSON com todos os parâmetros e derivados, inclusive `theta_lim`, `raw_mm` e `taw_mm`), `canteiros` (JSON, canteiro → estratégia), `metricas` (JSON, estratégia → métricas da rodada) e `gerado_em`.
+
 ---
 
 ## 2. Contrato HTTP da Interface de Ingestão e Consulta
@@ -110,7 +115,16 @@ Endpoints `POST` exigem cabeçalho:
 ```http
 Authorization: Bearer <token-do-dispositivo>
 ```
-O token deve pertencer ao `dispositivo` informado no corpo da requisição (`401 Unauthorized` ou `403 Forbidden` caso inválido ou divergente).
+O token deve pertencer ao `dispositivo` informado no corpo da requisição (`401 Unauthorized` caso inválido, divergente ou de dispositivo desabilitado).
+
+- O servidor compara o SHA-256 do token recebido com o hash guardado, em tempo constante (`hmac.compare_digest`), e nunca escreve o token em log: o log de acesso traz só método, caminho e status.
+- O token de produção do `sim-001` vem da variável de ambiente `DEVICE_TOKEN` (pelo menos 24 caracteres); `python3 main.py serve` não sobe sem ela e troca o hash guardado pelo do token configurado.
+- Os tokens que estiveram no código até a tag `v1-parecer` estão comprometidos: `serve` e `pipeline` os recusam como `DEVICE_TOKEN`, e o `esp32-001` fica desabilitado até receber um token novo.
+
+### 2.1.1 Limites e CORS
+- Corpo de requisição limitado a 1 MB (`413 Payload Too Large`); `Content-Length` é obrigatório (`411 Length Required`); o corpo precisa ser um objeto JSON (`400`).
+- CORS só para a origem configurada em `CORS_ORIGIN`; sem ela, nenhum cabeçalho `Access-Control-Allow-Origin` é enviado (o painel é servido pela mesma origem da API).
+- Erros internos respondem `500` com mensagem genérica, sem detalhes do servidor.
 
 ### 2.2 `POST /api/v1/leituras`
 Recebe um lote de leituras. Aplica calibração vigente e garante idempotência pelo par `(dispositivo, seq)`.
@@ -178,4 +192,8 @@ Recebe um lote de eventos de irrigação com semântica idêntica de idempotênc
 - `GET /api/v1/canteiros/{id}/series?de=&ate=&tipo=`: Retorna a série temporal de leituras calibradas e brutas do canteiro (`{id}` aceita `id` numérico ou `codigo` como `C1`).
 - `GET /api/v1/canteiros/{id}/eventos?de=&ate=`: Retorna os eventos de irrigação do canteiro no período.
 - `GET /api/v1/export.csv?canteiro=&de=&ate=`: Exporta em formato CSV as leituras e eventos consolidados para análise externa.
-- `GET /api/v1/comparativo`: Retorna a matriz completa de métricas de saída (Seção 5) das três estratégias (`E1`, `E2`, `E3`) nos cenários de escassez (`Abundante`, `Moderado`, `Restrito`) e períodos climáticos (`Seca`, `Chuvosa`), além do relatório de validação física do modelo (Seção 6).
+- `GET /api/v1/resultados` (e o nome antigo `GET /api/v1/comparativo`): devolve `resultados/v2/resultados.json`, com parâmetros, cenários e as métricas do v2 de cada ciclo, cenário e estratégia. O servidor não roda simulação: se o arquivo não existir, responde `404` pedindo `python3 main.py pipeline`.
+- `GET /api/v1/simulacao`: a simulação carregada no banco (tabela `simulacao`).
+- `GET /api/v1/tabelas/{nome}`: uma tabela do artigo em JSON (`campos`, `linhas`); só `tab_desempenho_chuvoso`, `tab_desempenho_seco`, `tab_capacidade_minima`, `tab_clima_ciclos` e `tab_cenarios`.
+- `GET /resultados/figuras/{nome}.png`: as Figuras 1 e 2 do artigo (`figura1_sensibilidade_e1.png`, `figura2_seco_restrito.png`).
+- `GET /healthz`: `{"status": "ok", "banco": {...}}` quando o banco abre e responde (usado pelo HEALTHCHECK do Docker).
