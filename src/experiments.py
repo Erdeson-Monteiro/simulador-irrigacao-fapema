@@ -164,7 +164,7 @@ def construir_tabela_t8_parametros(soil: SoilParams, meta_proc: Dict[str, Any]) 
             "significado": "Espessura da Camada 1 (zona radicular ativa: 0 a 20 cm)",
             "valor": f"{soil.z1:.0f}",
             "unidade": "mm",
-            "origem": "Marouelli et al. (2008), página [A CONFIRMAR PELO AUTOR]; FAO-56, Tabela 22 (profundidade máxima 0,3–0,5 m)",
+            "origem": "Marouelli, Silva e Silva (2008, p. 84), Tabela 25: 15 cm na fase vegetativa e 20 cm nas fases 3 e 4; o modelo usa 20 cm; FAO-56, Tabela 22 (profundidade máxima 0,3–0,5 m)",
         },
         {
             "simbolo": "z2",

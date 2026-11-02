@@ -20,7 +20,7 @@ import sys
 from importlib import metadata
 from typing import Dict, List, Optional, Sequence
 
-from src.v2.dados_externos import PESOS_JANELA_NORMAL
+from src.v2.dados_externos import FONTE_MEDIA_CHUVA, PESOS_JANELA_MEDIA
 from src.v2.formatacao import data_br, inteiro, num, tabela_markdown
 from src.v2.inmet import ROOT_DIR
 from src.v2.modelo import ESTRATEGIAS, NOMES_ESTRATEGIAS, SEQUEIRO
@@ -101,7 +101,7 @@ def montar_numeros(res, tempo_total_s: float) -> Numeros:
     N = Numeros(res)
     par = res.par
 
-    N.secao("1. Clima dos ciclos, viés PM × HS e normal")
+    N.secao("1. Clima dos ciclos, viés PM × HS e média de chuva")
     for c in CICLOS:
         nc = NOME_CICLO[c]
         N.add(f"Chuva no ciclo {nc}", "tab_clima_ciclos", c, "chuva_mm", 1, " mm")
@@ -116,8 +116,10 @@ def montar_numeros(res, tempo_total_s: float) -> Numeros:
         N.add(f"Maior chuva diária (dia local), ciclo {nc}", "tab_clima_ciclos", c, "maior_chuva_diaria_mm", 1, " mm")
         N.add(f"Data da maior chuva diária, ciclo {nc}", "tab_clima_ciclos", c, "data_maior_chuva_diaria", tipo="data")
         N.add(f"Maior chuva horária, ciclo {nc}", "tab_clima_ciclos", c, "maior_chuva_horaria_mm", 1, " mm")
-        N.add(f"Normal 1991–2020 da janela, ciclo {nc}", "tab_normal_climatologica", c, "normal_janela_mm", 1, " mm")
-        N.add(f"Chuva de 2023 em % da normal, ciclo {nc}", "tab_normal_climatologica", c, "chuva_sobre_normal_pct", 1, "%")
+        N.add(f"Média 1991–2021 da janela (Corrêa, Carvalho e Mendes, 2023), ciclo {nc}", "tab_normal_climatologica", c,
+              "media_janela_mm", 1, " mm")
+        N.add(f"Chuva de 2023 em % da média 1991–2021, ciclo {nc}", "tab_normal_climatologica", c,
+              "chuva_sobre_media_pct", 1, "%")
 
     N.secao("2. Parâmetros e cenários")
     N.add("TAW (z₁ = 200 mm)", "tab_parametros", "taw", "valor", 1, " mm")
@@ -317,17 +319,14 @@ def montar_relatorio(res, tempo_total_s: float) -> str:
           f"({'+' if hs > pm else ''}{num((hs - pm) / pm * 100)}%).")
     a("")
     a(md["tab_normal_climatologica"])
-    if res.normal:
-        for c in CICLOS:
-            normal = res.normal.janela(PESOS_JANELA_NORMAL[c])
-            chuva = sum(h.p_mm for h in res.ciclos[c].horas)
-            a(f"- Ciclo {NOME_CICLO[c]}: {num(chuva)} mm em 2023 contra {num(normal)} mm da normal "
-              f"({num(chuva / normal * 100)}% da normal).")
-        a("")
-    else:
-        a(f"A comparação com a normal 1991–2020 fica {PENDENTE}: {res.normal_situacao}. Sem o arquivo, não se pode "
-          "dizer se o ciclo chuvoso de 2023 foi atípico.")
-        a("")
+    a(f"Média de referência: {FONTE_MEDIA_CHUVA}.")
+    a("")
+    for c in CICLOS:
+        media = res.media_chuva.janela(PESOS_JANELA_MEDIA[c])
+        chuva = sum(h.p_mm for h in res.ciclos[c].horas)
+        a(f"- Ciclo {NOME_CICLO[c]}: {num(chuva)} mm em 2023 contra {num(media)} mm da média 1991–2021 "
+          f"({num(chuva / media * 100)}% da média).")
+    a("")
 
     a("## 2. Parâmetros e cenários")
     a("")
@@ -437,8 +436,8 @@ def montar_relatorio(res, tempo_total_s: float) -> str:
     v1 = res.v1
     seq_v1 = v1.metricas[("chuvoso", "Sequeiro", "Sequeiro")]
     aw_v1 = v1.soil.agua_disponivel_mm
-    a(f"1. **Seção 2.4 (confronto com normais).** O v1 anunciava o confronto e não o fazia. No v2 ele está na tabela "
-      f"de normal acima{'' if res.normal else ' e fica ' + PENDENTE + ' até o arquivo do INMET ser baixado'}.")
+    a("1. **Seção 2.4 (confronto com normais).** O v1 anunciava o confronto e não o fazia. No v2 a chuva dos ciclos "
+      "é comparada com a média 1991–2021 da estação 82768 (Corrêa, Carvalho e Mendes, 2023), na seção 1.")
     a(f"2. **Seção 11 (percolação do sequeiro).** O texto fixo citava outro valor; a percolação do sequeiro no ciclo "
       f"chuvoso calculada pelo v1 é {num(seq_v1['percolacao_acumulada_mm'], 2)} mm. No v2 ela é "
       f"{num(res.sequeiro['chuvoso'].metricas.percolacao_mm, 2)} mm.")
@@ -540,7 +539,7 @@ def montar_ambiente(tempo_total_s: float, tempo_rodadas_s: float, n_rodadas: int
             ["Processador", platform.machine()],
             ["SQLite", sqlite3.sqlite_version],
             ["Fonte das figuras", os.path.basename(fonte)],
-            ["Impressão digital do código (SHA-256 de src/, main.py, requirements.txt e data/raw/)",
+            ["Impressão digital do código (SHA-256 de src/, main.py, requirements.txt, data/raw/ e data/referencias/)",
              f"`{impressao_digital_do_codigo(ROOT_DIR)}`"],
             ["Último commit do git que alterou o código",
              (commit or "indisponível") + (" (havia alterações ainda não commitadas)" if sujo else "")],

@@ -176,10 +176,10 @@ A imagem parte de `python:3.12.3-slim-bookworm`, roda com usuário sem privilég
 | Dado | Origem | SHA-256 |
 |---|---|---|
 | `data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV` | INMET, dados históricos anuais: https://portal.inmet.gov.br/uploads/dadoshistoricos/2023.zip | `7aa68f3a9a2c09ef19a822490fb5fe957c1e0b37bed7ca6b084e3e38d450b233` |
-| Normal climatológica 1991–2020 (precipitação) | https://portal.inmet.gov.br/uploads/normais/Normal-Climatologica-PREC.xlsx → `data/raw/normais/` | registrado ao preparar |
-| Dados de 2024 e 2025 da A204 | https://portal.inmet.gov.br/uploads/dadoshistoricos/2024.zip e `2025.zip` → `data/raw/downloads/` | registrados ao preparar |
+| Média de chuva 1991–2021 da estação 82768 (Balsas) | Corrêa, Carvalho e Mendes (2023), Tabela 6 → [`data/referencias/correa_2023_balsas_82768.csv`](data/referencias/correa_2023_balsas_82768.csv) | versionado no git |
+| `data/raw/INMET_NE_MA_A204_BALSAS_01-01-2024_A_31-12-2024.CSV` e `..._2025_...CSV` | INMET: https://portal.inmet.gov.br/uploads/dadoshistoricos/2024.zip e `2025.zip`, extraídos com `python3 main.py dados --preparar` | em `data/raw/SHA256SUMS` |
 
-O SHA-256 de cada arquivo bruto fica em [`data/raw/SHA256SUMS`](data/raw/SHA256SUMS); o modelo recusa arquivo fora do registro ou com hash diferente. A normal climatológica e os anos de 2024 e 2025 servem para contextualizar 2023 e ainda não foram baixados: enquanto isso, as tabelas correspondentes mostram `[A CONFIRMAR PELO AUTOR]`. Para incluí-los, baixe os três arquivos nas pastas indicadas e rode `python3 main.py dados --preparar` e `python3 main.py pipeline`.
+O SHA-256 de cada arquivo bruto fica em [`data/raw/SHA256SUMS`](data/raw/SHA256SUMS); o modelo recusa arquivo fora do registro ou com hash diferente. A média de chuva e os anos de 2024 e 2025 servem para contextualizar 2023: a chuva dos ciclos é comparada com a média ([`tab_normal_climatologica.md`](resultados/v2/tabelas/tab_normal_climatologica.md)), e 2024 e 2025 entram só na completude da estação ([`tab_completude_anos.md`](resultados/v2/tabelas/tab_completude_anos.md)). Para refazer a extração, coloque os zips do INMET em `data/raw/downloads/` e rode `python3 main.py dados --preparar` e `python3 main.py pipeline`.
 
 ## Documentação
 

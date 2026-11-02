@@ -1,9 +1,9 @@
-**Chuva dos ciclos de 2023 × normal climatológica 1991–2020 (Balsas-MA)**
+**Chuva dos ciclos de 2023 × média 1991–2021 (Balsas-MA)**
 
-| Ciclo | P 2023 (mm) | Normal 1991–2020 (mm) | P/normal (%) |
+| Ciclo | P 2023 (mm) | Média 1991–2021 (mm) | P/média (%) |
 |---|---:|---:|---:|
-| Chuvoso | 299,2 | [A CONFIRMAR PELO AUTOR] | [A CONFIRMAR PELO AUTOR] |
-| Seco | 42,2 | [A CONFIRMAR PELO AUTOR] | [A CONFIRMAR PELO AUTOR] |
+| Chuvoso | 299,2 | 455,0 | 65,8 |
+| Seco | 42,2 | 8,8 | 481,7 |
 
-Normal da janela = soma proporcional por dias: chuvoso = jan × 17/31 + fev × 28/28 + mar × 25/31; seco = jul + ago + set × 8/30. Fonte: INMET, Normais climatológicas do Brasil 1991-2020 (2022).  
-Normal não calculada: arquivo ausente; baixar de https://portal.inmet.gov.br/uploads/normais/Normal-Climatologica-PREC.xlsx para data/raw/normais/Normal-Climatologica-PREC.xlsx
+Média da janela = soma das médias mensais ponderadas pelos dias de cada mês na janela: chuvoso = jan × 17/31 + fev × 28/28 + mar × 25/31; seco = jul + ago + set × 8/30.  
+Fonte: Corrêa, Carvalho e Mendes (2023), Tabela 6: média 1991–2021 da estação convencional 82768 (Balsas) (arquivo `data/referencias/correa_2023_balsas_82768.csv`).

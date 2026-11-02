@@ -2,7 +2,7 @@
 
 Projeto PIC/FAPEMA "Automação da Irrigação em Hortas Comunitárias com Sensores e IoT" (Edital COORD.NUPEX nº 01/2026). Autor: Erdeson Monteiro Candeias. Orientador: Prof. Alex Rogaleski Marques.
 
-Gerado por `python3 main.py pipeline` em 31/10/2026. Todos os números saem dos resultados calculados; nada foi digitado. Modelo descrito em [`docs/MODELO.md`](../../docs/MODELO.md); números para citação em [`NUMEROS_ARTIGO.md`](NUMEROS_ARTIGO.md).
+Gerado por `python3 main.py pipeline` em 01/11/2026. Todos os números saem dos resultados calculados; nada foi digitado. Modelo descrito em [`docs/MODELO.md`](../../docs/MODELO.md); números para citação em [`NUMEROS_ARTIGO.md`](NUMEROS_ARTIGO.md).
 
 ## 1. Dados
 
@@ -15,8 +15,8 @@ Série horária da estação automática A204 (BALSAS-MA) do INMET, arquivo `dat
 | Período (dias locais) | 15/01 a 25/03/2023 | 01/07 a 08/09/2023 |
 | Horas | 1.680 | 1.680 |
 | P (mm) | 299,2 | 42,2 |
-| Normal 1991–2020 da janela (mm) | [A CONFIRMAR PELO AUTOR] | [A CONFIRMAR PELO AUTOR] |
-| P/normal (%) | [A CONFIRMAR PELO AUTOR] | [A CONFIRMAR PELO AUTOR] |
+| Média 1991–2021 da janela (mm) | 455,0 | 8,8 |
+| P/média (%) | 65,8 | 481,7 |
 | ΣET0 PM (mm) | 279,0 | 358,5 |
 | ET0 PM média (mm/d) | 3,99 | 5,12 |
 | ΣET0 HS (mm) | 357,4 | 409,4 |
@@ -29,23 +29,26 @@ Série horária da estação automática A204 (BALSAS-MA) do INMET, arquivo `dat
 | Maior chuva horária (mm) | 40,0 | 16,2 |
 
 Viés = (ΣET0 HS − ΣET0 PM)/ΣET0 PM. ETc com a curva de Kc do FAO-56 (eq. 66). Dia local = UTC − 3. ET0 horária negativa zerada.  
-A normal 1991–2020 não foi calculada: arquivo ausente; baixar de https://portal.inmet.gov.br/uploads/normais/Normal-Climatologica-PREC.xlsx para data/raw/normais/Normal-Climatologica-PREC.xlsx  
+Média da janela: Corrêa, Carvalho e Mendes (2023), Tabela 6: média 1991–2021 da estação convencional 82768 (Balsas), ponderada pelos dias de cada mês na janela.  
 Abreviaturas: P = chuva; ET0 = evapotranspiração de referência; PM = Penman-Monteith horário (FAO-56, eq. 53); HS = Hargreaves-Samani (FAO-56, eq. 52), por dia local; ETc = Kc·ET0, evapotranspiração potencial da cultura; u₂ = vento a 2 m (eq. 47, anemômetro a 10 m).
 
 - Ciclo chuvoso: Hargreaves-Samani dá 357,4 mm, contra 279,0 mm de Penman-Monteith (+28,1%).
 - Ciclo seco: Hargreaves-Samani dá 409,4 mm, contra 358,5 mm de Penman-Monteith (+14,2%).
 
-**Chuva dos ciclos de 2023 × normal climatológica 1991–2020 (Balsas-MA)**
+**Chuva dos ciclos de 2023 × média 1991–2021 (Balsas-MA)**
 
-| Ciclo | P 2023 (mm) | Normal 1991–2020 (mm) | P/normal (%) |
+| Ciclo | P 2023 (mm) | Média 1991–2021 (mm) | P/média (%) |
 |---|---:|---:|---:|
-| Chuvoso | 299,2 | [A CONFIRMAR PELO AUTOR] | [A CONFIRMAR PELO AUTOR] |
-| Seco | 42,2 | [A CONFIRMAR PELO AUTOR] | [A CONFIRMAR PELO AUTOR] |
+| Chuvoso | 299,2 | 455,0 | 65,8 |
+| Seco | 42,2 | 8,8 | 481,7 |
 
-Normal da janela = soma proporcional por dias: chuvoso = jan × 17/31 + fev × 28/28 + mar × 25/31; seco = jul + ago + set × 8/30. Fonte: INMET, Normais climatológicas do Brasil 1991-2020 (2022).  
-Normal não calculada: arquivo ausente; baixar de https://portal.inmet.gov.br/uploads/normais/Normal-Climatologica-PREC.xlsx para data/raw/normais/Normal-Climatologica-PREC.xlsx
+Média da janela = soma das médias mensais ponderadas pelos dias de cada mês na janela: chuvoso = jan × 17/31 + fev × 28/28 + mar × 25/31; seco = jul + ago + set × 8/30.  
+Fonte: Corrêa, Carvalho e Mendes (2023), Tabela 6: média 1991–2021 da estação convencional 82768 (Balsas) (arquivo `data/referencias/correa_2023_balsas_82768.csv`).
 
-A comparação com a normal 1991–2020 fica [A CONFIRMAR PELO AUTOR]: arquivo ausente; baixar de https://portal.inmet.gov.br/uploads/normais/Normal-Climatologica-PREC.xlsx para data/raw/normais/Normal-Climatologica-PREC.xlsx. Sem o arquivo, não se pode dizer se o ciclo chuvoso de 2023 foi atípico.
+Média de referência: Corrêa, Carvalho e Mendes (2023), Tabela 6: média 1991–2021 da estação convencional 82768 (Balsas).
+
+- Ciclo chuvoso: 299,2 mm em 2023 contra 455,0 mm da média 1991–2021 (65,8% da média).
+- Ciclo seco: 42,2 mm em 2023 contra 8,8 mm da média 1991–2021 (481,7% da média).
 
 ## 2. Parâmetros e cenários
 
@@ -57,7 +60,7 @@ A comparação com a normal 1991–2020 fica [A CONFIRMAR PELO AUTOR]: arquivo a
 | θpmp | Umidade no ponto de murcha permanente | 0,14 | cm³ cm⁻³ | FAO-56, Tabela 19 (solo franco: θcc 0,20–0,30; θpmp 0,07–0,17); página [A CONFIRMAR PELO AUTOR] |
 | θsat | Umidade na saturação | 0,45 | cm³ cm⁻³ | premissa do modelo, sem efeito nas métricas (teste) |
 | p | Fração da TAW esgotável sem estresse | 0,30 | — | FAO-56, Tabela 22 (alface, p = 0,30) |
-| z₁ | Espessura da camada 1 (zona radicular efetiva, 0–20 cm) | 200,0 | mm | Marouelli et al. (2008), página [A CONFIRMAR PELO AUTOR]; FAO-56, Tabela 22 (0,3–0,5 m) |
+| z₁ | Espessura da camada 1 (zona radicular efetiva, 0–20 cm) | 200,0 | mm | Marouelli, Silva e Silva (2008, p. 84), Tabela 25: 15 cm na fase vegetativa e 20 cm nas fases 3 e 4; o modelo usa 20 cm; FAO-56, Tabela 22 (0,3–0,5 m) |
 | z₂ | Espessura da camada 2 (20–40 cm) | 200,0 | mm | premissa do modelo, sem efeito nas métricas (teste) |
 | f_ext2 | Fração da ETa retirada da camada 2 | 0,0 | — | premissa do modelo |
 | θ₁(0), θ₂(0) | Umidade inicial das camadas (perfil na capacidade de campo) | 0,28 | cm³ cm⁻³ | premissa do modelo |
@@ -277,7 +280,7 @@ A coluna "TSE diário v2" aplica ao v2 uma medida por dia: basta uma hora com Dr
 
 ## 9. Correções em relação ao relatório do v1
 
-1. **Seção 2.4 (confronto com normais).** O v1 anunciava o confronto e não o fazia. No v2 ele está na tabela de normal acima e fica [A CONFIRMAR PELO AUTOR] até o arquivo do INMET ser baixado.
+1. **Seção 2.4 (confronto com normais).** O v1 anunciava o confronto e não o fazia. No v2 a chuva dos ciclos é comparada com a média 1991–2021 da estação 82768 (Corrêa, Carvalho e Mendes, 2023), na seção 1.
 2. **Seção 11 (percolação do sequeiro).** O texto fixo citava outro valor; a percolação do sequeiro no ciclo chuvoso calculada pelo v1 é 84,39 mm. No v2 ela é 145,34 mm.
 3. **Seção 12.1 ("série sintética").** A menção foi retirada do gerador do v1. Todo resultado usa só o arquivo do INMET, conferido pelo SHA-256.
 4. **Seções 12.2 e 12.3 (banda morta).** No v1, θlim correspondia a p·AD = 0,35 × 28,0 = 9,80 mm de depleção, mas E2/E3 só disparavam com déficit ≥ 10,0 mm. No v2 o gatilho é o próprio RAW = 8,4 mm, calculado, e a banda deixa de existir.
@@ -325,18 +328,24 @@ Fase média do Kc: dias 48 a 61 do ciclo. p ajustado = 0,30 + 0,04·(5 − ETc),
 |---:|---|---|---:|---:|---:|---:|---:|---:|
 | 2023 | chuvoso | 15/01 a 25/03 | 70 | 70 | 0 | 0 | 0 | 100,0 |
 | 2023 | seco | 01/07 a 08/09 | 70 | 70 | 0 | 0 | 0 | 100,0 |
+| 2024 | chuvoso | 15/01 a 25/03 | 71 | 70 | 1 | 0 | 0 | 99,9 |
+| 2024 | seco | 01/07 a 08/09 | 70 | 6 | 4 | 60 | 27 | 10,8 |
+| 2024 | julho a setembro | 01/07 a 30/09 | 92 | 6 | 4 | 82 | 49 | 8,2 |
+| 2024 | maio a dezembro | 01/05 a 31/12 | 245 | 25 | 7 | 213 | 141 | 11,8 |
+| 2025 | chuvoso | 15/01 a 25/03 | 70 | 62 | 1 | 7 | 7 | 89,3 |
+| 2025 | seco | 01/07 a 08/09 | 70 | 0 | 0 | 70 | 70 | 0,0 |
+| 2025 | julho a setembro | 01/07 a 30/09 | 92 | 0 | 0 | 92 | 92 | 0,0 |
+| 2025 | maio a dezembro | 01/05 a 31/12 | 245 | 0 | 0 | 245 | 245 | 0,0 |
 
-Dia completo = 24 horas com todas as variáveis usadas no v2. Dia sem registro = nenhuma variável em nenhuma hora. Lacuna = dias consecutivos sem registro. Dias locais (UTC − 3); o último dia local do ano depende das 3 primeiras horas UTC do arquivo do ano seguinte.  
-Dados horários de 2024, estação A204 (extraídos de 2024.zip): [A CONFIRMAR PELO AUTOR], arquivo ausente (baixar de https://portal.inmet.gov.br/uploads/dadoshistoricos/2024.zip para `data/raw/downloads/2024.zip`).  
-Dados horários de 2025, estação A204 (extraídos de 2025.zip): [A CONFIRMAR PELO AUTOR], arquivo ausente (baixar de https://portal.inmet.gov.br/uploads/dadoshistoricos/2025.zip para `data/raw/downloads/2025.zip`).
+Dia completo = 24 horas com todas as variáveis usadas no v2. Dia sem registro = nenhuma variável em nenhuma hora. Lacuna = dias consecutivos sem registro. Dias locais (UTC − 3); o último dia local do ano depende das 3 primeiras horas UTC do arquivo do ano seguinte.
 
 **Conferência das afirmações sobre 2024 e 2025**
 
 | Afirmação do artigo | Valor afirmado | Valor no arquivo do INMET | Confere? |
 |---|---:|---:|---|
-| 2024: dias sem registro na janela do ciclo seco (01/07 a 08/09) | 60 | [A CONFIRMAR PELO AUTOR] | [A CONFIRMAR PELO AUTOR] |
-| 2024: maior lacuna contínua na janela do ciclo seco (dias) | 27 | [A CONFIRMAR PELO AUTOR] | [A CONFIRMAR PELO AUTOR] |
-| 2025: sem registros de maio a dezembro | todos os dias | [A CONFIRMAR PELO AUTOR] | [A CONFIRMAR PELO AUTOR] |
+| 2024: dias sem registro na janela do ciclo seco (01/07 a 08/09) | 60 | 60 | sim |
+| 2024: maior lacuna contínua na janela do ciclo seco (dias) | 27 | 27 | sim |
+| 2025: sem registros de maio a dezembro | 245 | 245 | sim |
 
 Dias locais; "sem registro" = nenhuma variável em nenhuma hora do dia. Sem o arquivo do ano, a afirmação fica a confirmar (nada é estimado).
 
@@ -344,9 +353,8 @@ Dias locais; "sem registro" = nenhuma variável em nenhuma hora do dia. Sem o ar
 
 | Arquivo | Pasta de destino | URL | Situação |
 |---|---|---|---|
-| Normal climatológica 1991–2020, precipitação (planilha do INMET) | `data/raw/normais/Normal-Climatologica-PREC.xlsx` | https://portal.inmet.gov.br/uploads/normais/Normal-Climatologica-PREC.xlsx | ausente |
-| Dados horários de 2024, estação A204 (extraídos de 2024.zip) | `data/raw/downloads/2024.zip` | https://portal.inmet.gov.br/uploads/dadoshistoricos/2024.zip | ausente |
-| Dados horários de 2025, estação A204 (extraídos de 2025.zip) | `data/raw/downloads/2025.zip` | https://portal.inmet.gov.br/uploads/dadoshistoricos/2025.zip | ausente |
+| Dados horários de 2024, estação A204 (extraídos de 2024.zip) | `data/raw/INMET_NE_MA_A204_BALSAS_01-01-2024_A_31-12-2024.CSV` | https://portal.inmet.gov.br/uploads/dadoshistoricos/2024.zip | presente e registrado |
+| Dados horários de 2025, estação A204 (extraídos de 2025.zip) | `data/raw/INMET_NE_MA_A204_BALSAS_01-01-2025_A_31-12-2025.CSV` | https://portal.inmet.gov.br/uploads/dadoshistoricos/2025.zip | presente e registrado |
 
 Arquivos ausentes não são estimados. Depois de baixá-los, rode `python3 main.py dados --preparar` e `python3 main.py pipeline`.
 
@@ -358,7 +366,7 @@ Lista completa na seção 9 de `docs/MODELO.md`: um só ano; camada 2 sem extra�
 
 ## 13. Reprodutibilidade
 
-Ambiente e tempo de execução em [`AMBIENTE.md`](AMBIENTE.md) (8,9 s nesta execução). SHA-256 de cada CSV em [`CHECKSUMS.txt`](CHECKSUMS.txt).
+Ambiente e tempo de execução em [`AMBIENTE.md`](AMBIENTE.md) (8,0 s nesta execução). SHA-256 de cada CSV em [`CHECKSUMS.txt`](CHECKSUMS.txt).
 
 ## 14. Arquivos
 

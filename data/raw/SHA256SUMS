@@ -1,2 +1,6 @@
 # SHA-256 dos arquivos brutos em data/raw (formato do sha256sum). O v2 recusa arquivo fora deste registro.
 7aa68f3a9a2c09ef19a822490fb5fe957c1e0b37bed7ca6b084e3e38d450b233  INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV
+# extraído de 2024.zip (https://portal.inmet.gov.br/uploads/dadoshistoricos/2024.zip), SHA-256 do zip 0a7f89de57427f79b6f82943b2f7f2e932202d9253e34bf25629ed088d108ae7
+1a254ac6840326889486bb5e318f80bd07d0c7dca5b95db2a36d42af014eaf40  INMET_NE_MA_A204_BALSAS_01-01-2024_A_31-12-2024.CSV
+# extraído de 2025.zip (https://portal.inmet.gov.br/uploads/dadoshistoricos/2025.zip), SHA-256 do zip 14988d0b736ba969b48881589f602f3a6d7e97b95bd1de934456851fdac2cb89
+fd78901fbe4b2b710b844c6ea4594208b2e53b3dd2fbd4885b743fdc2e36c41d  INMET_NE_MA_A204_BALSAS_01-01-2025_A_31-12-2025.CSV

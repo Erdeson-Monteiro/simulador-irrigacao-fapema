@@ -98,7 +98,7 @@ def figura_seco_restrito(
     dados = escrever_csv(base + "_dados.csv", raiz, campos, registros, list(metadados) + [
         f"RAW_mm={raw_mm:.6g}; TAW_mm={taw_mm:.6g}; tempo_dias = fim da hora, em dias desde 00:00 do dia 1"])
 
-    fig, (ax_a, ax_b) = estilo.nova_figura(12.0, 2, 1, sharex=True)
+    fig, (ax_a, ax_b) = estilo.nova_figura(9.5, 2, 1, sharex=True)
     for i, e in enumerate(estrategias):
         st = dict(estilo.ESTILOS[e])
         marca = dict(markevery=(8 * i, 24), markersize=3.0, linewidth=0.8)
@@ -107,8 +107,8 @@ def figura_seco_restrito(
     for valor, nome in ((raw_mm, "RAW"), (taw_mm, "TAW")):
         ax_b.axhline(valor, color=estilo.COR_REFERENCIA, linewidth=0.7, linestyle=(0, (6, 2)))
         ax_b.text(t_dias[-1], valor, f" {nome}", va="center", ha="left", color="#333333")
-    ax_a.set_ylabel("Volume no reservatório (L)")
-    ax_b.set_ylabel("Depleção da zona radicular, Dr (mm)")
+    ax_a.set_ylabel("Volume (L)")
+    ax_b.set_ylabel("Dr (mm)")
     ax_b.set_xlabel("Tempo desde o início do ciclo (d)")
     ax_b.set_xlim(0, t_dias[-1])
     ax_b.set_xticks(list(range(0, int(t_dias[-1]) + 1, 7)))

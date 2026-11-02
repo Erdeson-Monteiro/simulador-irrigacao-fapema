@@ -3,7 +3,7 @@ simbolo,significado,valor,unidade,origem
 θ_cc,Umidade volumétrica do solo na capacidade de campo,0.28,cm³/cm³,"FAO-56, Tabela 19 (solo franco: θcc 0,20–0,30), página [A CONFIRMAR PELO AUTOR]; valor dentro da faixa"
 θ_pmp,Umidade volumétrica do solo no ponto de murcha permanente,0.14,cm³/cm³,"FAO-56, Tabela 19 (solo franco: θpmp 0,07–0,17), página [A CONFIRMAR PELO AUTOR]; valor dentro da faixa"
 p,Fração de depleção da água disponível tolerada antes do estresse hídrico,0.35,adimensional,"sem fonte: o FAO-56, Tabela 22, indica p = 0,30 para alface (valor adotado no v2)"
-z1,Espessura da Camada 1 (zona radicular ativa: 0 a 20 cm),200,mm,"Marouelli et al. (2008), página [A CONFIRMAR PELO AUTOR]; FAO-56, Tabela 22 (profundidade máxima 0,3–0,5 m)"
+z1,Espessura da Camada 1 (zona radicular ativa: 0 a 20 cm),200,mm,"Marouelli, Silva e Silva (2008, p. 84), Tabela 25: 15 cm na fase vegetativa e 20 cm nas fases 3 e 4; o modelo usa 20 cm; FAO-56, Tabela 22 (profundidade máxima 0,3–0,5 m)"
 z2,Espessura da Camada 2 (abaixo da zona radicular: 20 a 40 cm),200,mm,premissa do modelo
 AD,Capacidade de água disponível na zona radicular,28.0,mm,derivado: AD = (θ_cc − θ_pmp) × z1
 θ_lim,Limiar crítico de umidade volumétrica na Camada 1 para conforto hídrico e disparo da E1,0.231,cm³/cm³,derivado: θ_lim = θ_cc − p × (θ_cc − θ_pmp)

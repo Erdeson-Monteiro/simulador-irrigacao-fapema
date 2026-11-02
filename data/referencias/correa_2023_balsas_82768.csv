@@ -1,0 +1,12 @@
+# Precipitação média mensal (mm), 1991–2021, estação convencional 82768 (Balsas-MA).
+# Fonte: CORRÊA, W. C.; CARVALHO, M. W. L.; MENDES, T. J. Atualização da classificação climática e
+# balanço hídrico climatológico no Estado do Maranhão. Revista Brasileira de Climatologia, v. 32,
+# p. 517-543, 2023. https://ojs.ufgd.edu.br/rbclima/article/download/16727/9412/58836
+# Tabela de origem: Tabela 6 do artigo. Só os meses das janelas dos ciclos (jan–mar e jul–set).
+mes,precipitacao_media_mm
+1,221.8
+2,187.9
+3,180.4
+7,2.5
+8,1.3
+9,18.6

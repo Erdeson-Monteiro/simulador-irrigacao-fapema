@@ -2,7 +2,7 @@
 
 Gerado por `python3 main.py pipeline`. Cada valor vem do arquivo, da linha física e da coluna indicados (caminhos relativos a `resultados/v2/`; as linhas contam o cabeçalho `#` de metadados). Para conferir todos contra os CSVs: `python3 main.py conferir`.
 
-## 1. Clima dos ciclos, viés PM × HS e normal
+## 1. Clima dos ciclos, viés PM × HS e média de chuva
 
 | Nº | Descrição | Valor | Fonte |
 |---:|---|---:|---|
@@ -18,8 +18,8 @@ Gerado por `python3 main.py pipeline`. Cada valor vem do arquivo, da linha físi
 | 10 | Maior chuva diária (dia local), ciclo chuvoso | 77,8 mm | `tabelas/tab_clima_ciclos.csv:6` (`maior_chuva_diaria_mm`) |
 | 11 | Data da maior chuva diária, ciclo chuvoso | 17/03/2023 | `tabelas/tab_clima_ciclos.csv:6` (`data_maior_chuva_diaria`) |
 | 12 | Maior chuva horária, ciclo chuvoso | 40,0 mm | `tabelas/tab_clima_ciclos.csv:6` (`maior_chuva_horaria_mm`) |
-| 13 | Normal 1991–2020 da janela, ciclo chuvoso | [A CONFIRMAR PELO AUTOR] | `tabelas/tab_normal_climatologica.csv:6` (`normal_janela_mm`) |
-| 14 | Chuva de 2023 em % da normal, ciclo chuvoso | [A CONFIRMAR PELO AUTOR] | `tabelas/tab_normal_climatologica.csv:6` (`chuva_sobre_normal_pct`) |
+| 13 | Média 1991–2021 da janela (Corrêa, Carvalho e Mendes, 2023), ciclo chuvoso | 455,0 mm | `tabelas/tab_normal_climatologica.csv:6` (`media_janela_mm`) |
+| 14 | Chuva de 2023 em % da média 1991–2021, ciclo chuvoso | 65,8% | `tabelas/tab_normal_climatologica.csv:6` (`chuva_sobre_media_pct`) |
 | 15 | Chuva no ciclo seco | 42,2 mm | `tabelas/tab_clima_ciclos.csv:7` (`chuva_mm`) |
 | 16 | ΣET0 Penman-Monteith, ciclo seco | 358,5 mm | `tabelas/tab_clima_ciclos.csv:7` (`et0_pm_mm`) |
 | 17 | ET0 Penman-Monteith média, ciclo seco | 5,12 mm/d | `tabelas/tab_clima_ciclos.csv:7` (`et0_pm_mm_dia`) |
@@ -32,8 +32,8 @@ Gerado por `python3 main.py pipeline`. Cada valor vem do arquivo, da linha físi
 | 24 | Maior chuva diária (dia local), ciclo seco | 26,2 mm | `tabelas/tab_clima_ciclos.csv:7` (`maior_chuva_diaria_mm`) |
 | 25 | Data da maior chuva diária, ciclo seco | 31/08/2023 | `tabelas/tab_clima_ciclos.csv:7` (`data_maior_chuva_diaria`) |
 | 26 | Maior chuva horária, ciclo seco | 16,2 mm | `tabelas/tab_clima_ciclos.csv:7` (`maior_chuva_horaria_mm`) |
-| 27 | Normal 1991–2020 da janela, ciclo seco | [A CONFIRMAR PELO AUTOR] | `tabelas/tab_normal_climatologica.csv:7` (`normal_janela_mm`) |
-| 28 | Chuva de 2023 em % da normal, ciclo seco | [A CONFIRMAR PELO AUTOR] | `tabelas/tab_normal_climatologica.csv:7` (`chuva_sobre_normal_pct`) |
+| 27 | Média 1991–2021 da janela (Corrêa, Carvalho e Mendes, 2023), ciclo seco | 8,8 mm | `tabelas/tab_normal_climatologica.csv:7` (`media_janela_mm`) |
+| 28 | Chuva de 2023 em % da média 1991–2021, ciclo seco | 481,7% | `tabelas/tab_normal_climatologica.csv:7` (`chuva_sobre_media_pct`) |
 
 ## 2. Parâmetros e cenários
 
@@ -569,18 +569,31 @@ Varredura de 250 a 2.000 L, passo de 250 L. Quando nenhuma capacidade atende, TS
 | 509 | 2023, janela chuvoso: maior lacuna contínua | 0 d | `tabelas/tab_completude_anos.csv:6` (`maior_lacuna_sem_registro_dias`) |
 | 510 | 2023, janela seco: dias sem registro | 0 | `tabelas/tab_completude_anos.csv:7` (`dias_sem_registro`) |
 | 511 | 2023, janela seco: maior lacuna contínua | 0 d | `tabelas/tab_completude_anos.csv:7` (`maior_lacuna_sem_registro_dias`) |
-| 512 | 2024: dias sem registro na janela do ciclo seco (01/07 a 08/09): valor no arquivo | [A CONFIRMAR PELO AUTOR] | `tabelas/tab_afirmacoes_anos_vizinhos.csv:6` (`valor_obtido`) |
-| 513 | 2024: dias sem registro na janela do ciclo seco (01/07 a 08/09): confere? | [A CONFIRMAR PELO AUTOR] | `tabelas/tab_afirmacoes_anos_vizinhos.csv:6` (`confere`) |
-| 514 | 2024: maior lacuna contínua na janela do ciclo seco (dias): valor no arquivo | [A CONFIRMAR PELO AUTOR] | `tabelas/tab_afirmacoes_anos_vizinhos.csv:7` (`valor_obtido`) |
-| 515 | 2024: maior lacuna contínua na janela do ciclo seco (dias): confere? | [A CONFIRMAR PELO AUTOR] | `tabelas/tab_afirmacoes_anos_vizinhos.csv:7` (`confere`) |
-| 516 | 2025: sem registros de maio a dezembro: valor no arquivo | [A CONFIRMAR PELO AUTOR] | `tabelas/tab_afirmacoes_anos_vizinhos.csv:8` (`valor_obtido`) |
-| 517 | 2025: sem registros de maio a dezembro: confere? | [A CONFIRMAR PELO AUTOR] | `tabelas/tab_afirmacoes_anos_vizinhos.csv:8` (`confere`) |
-| 518 | Normal climatológica 1991–2020, precipitação (planilha do INMET) | [A CONFIRMAR PELO AUTOR] | arquivo ausente: https://portal.inmet.gov.br/uploads/normais/Normal-Climatologica-PREC.xlsx → `data/raw/normais/Normal-Climatologica-PREC.xlsx` |
-| 519 | Dados horários de 2024, estação A204 (extraídos de 2024.zip) | [A CONFIRMAR PELO AUTOR] | arquivo ausente: https://portal.inmet.gov.br/uploads/dadoshistoricos/2024.zip → `data/raw/downloads/2024.zip` |
-| 520 | Dados horários de 2025, estação A204 (extraídos de 2025.zip) | [A CONFIRMAR PELO AUTOR] | arquivo ausente: https://portal.inmet.gov.br/uploads/dadoshistoricos/2025.zip → `data/raw/downloads/2025.zip` |
+| 512 | 2024, janela chuvoso: dias sem registro | 0 | `tabelas/tab_completude_anos.csv:8` (`dias_sem_registro`) |
+| 513 | 2024, janela chuvoso: maior lacuna contínua | 0 d | `tabelas/tab_completude_anos.csv:8` (`maior_lacuna_sem_registro_dias`) |
+| 514 | 2024, janela julho a setembro: dias sem registro | 82 | `tabelas/tab_completude_anos.csv:10` (`dias_sem_registro`) |
+| 515 | 2024, janela julho a setembro: maior lacuna contínua | 49 d | `tabelas/tab_completude_anos.csv:10` (`maior_lacuna_sem_registro_dias`) |
+| 516 | 2024, janela maio a dezembro: dias sem registro | 213 | `tabelas/tab_completude_anos.csv:11` (`dias_sem_registro`) |
+| 517 | 2024, janela maio a dezembro: maior lacuna contínua | 141 d | `tabelas/tab_completude_anos.csv:11` (`maior_lacuna_sem_registro_dias`) |
+| 518 | 2024, janela seco: dias sem registro | 60 | `tabelas/tab_completude_anos.csv:9` (`dias_sem_registro`) |
+| 519 | 2024, janela seco: maior lacuna contínua | 27 d | `tabelas/tab_completude_anos.csv:9` (`maior_lacuna_sem_registro_dias`) |
+| 520 | 2025, janela chuvoso: dias sem registro | 7 | `tabelas/tab_completude_anos.csv:12` (`dias_sem_registro`) |
+| 521 | 2025, janela chuvoso: maior lacuna contínua | 7 d | `tabelas/tab_completude_anos.csv:12` (`maior_lacuna_sem_registro_dias`) |
+| 522 | 2025, janela julho a setembro: dias sem registro | 92 | `tabelas/tab_completude_anos.csv:14` (`dias_sem_registro`) |
+| 523 | 2025, janela julho a setembro: maior lacuna contínua | 92 d | `tabelas/tab_completude_anos.csv:14` (`maior_lacuna_sem_registro_dias`) |
+| 524 | 2025, janela maio a dezembro: dias sem registro | 245 | `tabelas/tab_completude_anos.csv:15` (`dias_sem_registro`) |
+| 525 | 2025, janela maio a dezembro: maior lacuna contínua | 245 d | `tabelas/tab_completude_anos.csv:15` (`maior_lacuna_sem_registro_dias`) |
+| 526 | 2025, janela seco: dias sem registro | 70 | `tabelas/tab_completude_anos.csv:13` (`dias_sem_registro`) |
+| 527 | 2025, janela seco: maior lacuna contínua | 70 d | `tabelas/tab_completude_anos.csv:13` (`maior_lacuna_sem_registro_dias`) |
+| 528 | 2024: dias sem registro na janela do ciclo seco (01/07 a 08/09): valor no arquivo | 60 | `tabelas/tab_afirmacoes_anos_vizinhos.csv:6` (`valor_obtido`) |
+| 529 | 2024: dias sem registro na janela do ciclo seco (01/07 a 08/09): confere? | sim | `tabelas/tab_afirmacoes_anos_vizinhos.csv:6` (`confere`) |
+| 530 | 2024: maior lacuna contínua na janela do ciclo seco (dias): valor no arquivo | 27 | `tabelas/tab_afirmacoes_anos_vizinhos.csv:7` (`valor_obtido`) |
+| 531 | 2024: maior lacuna contínua na janela do ciclo seco (dias): confere? | sim | `tabelas/tab_afirmacoes_anos_vizinhos.csv:7` (`confere`) |
+| 532 | 2025: sem registros de maio a dezembro: valor no arquivo | 245 | `tabelas/tab_afirmacoes_anos_vizinhos.csv:8` (`valor_obtido`) |
+| 533 | 2025: sem registros de maio a dezembro: confere? | sim | `tabelas/tab_afirmacoes_anos_vizinhos.csv:8` (`confere`) |
 
 ## 11. Execução
 
 | Nº | Descrição | Valor | Fonte |
 |---:|---|---:|---|
-| 521 | Tempo de execução do pipeline | 8,9 s | `AMBIENTE.md` |
+| 534 | Tempo de execução do pipeline | 8,0 s | `AMBIENTE.md` |

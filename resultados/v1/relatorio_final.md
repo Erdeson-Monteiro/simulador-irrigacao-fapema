@@ -11,7 +11,7 @@
 | **Orientador** | Prof. Alex Rogaleski Marques |
 | **Bolsista** | Erdeson |
 | **Referência no Plano de Trabalho** | Atividade 2.3 — Desenvolvimento do software e integração IoT (out/2026 a fev/2027) |
-| **Data de Geração do Relatório** | 2026-10-31 |
+| **Data de Geração do Relatório** | 2026-11-01 |
 
 ---
 
@@ -131,7 +131,7 @@ Arquivo CSV correspondente: [`tabelas/T8_parametros_e_fontes.csv`](tabelas/T8_pa
 | `θ_cc` | Umidade volumétrica do solo na capacidade de campo | `0.28` | `cm³/cm³` | FAO-56, Tabela 19 (solo franco: θcc 0,20–0,30), página [A CONFIRMAR PELO AUTOR]; valor dentro da faixa |
 | `θ_pmp` | Umidade volumétrica do solo no ponto de murcha permanente | `0.14` | `cm³/cm³` | FAO-56, Tabela 19 (solo franco: θpmp 0,07–0,17), página [A CONFIRMAR PELO AUTOR]; valor dentro da faixa |
 | `p` | Fração de depleção da água disponível tolerada antes do estresse hídrico | `0.35` | `adimensional` | sem fonte: o FAO-56, Tabela 22, indica p = 0,30 para alface (valor adotado no v2) |
-| `z1` | Espessura da Camada 1 (zona radicular ativa: 0 a 20 cm) | `200` | `mm` | Marouelli et al. (2008), página [A CONFIRMAR PELO AUTOR]; FAO-56, Tabela 22 (profundidade máxima 0,3–0,5 m) |
+| `z1` | Espessura da Camada 1 (zona radicular ativa: 0 a 20 cm) | `200` | `mm` | Marouelli, Silva e Silva (2008, p. 84), Tabela 25: 15 cm na fase vegetativa e 20 cm nas fases 3 e 4; o modelo usa 20 cm; FAO-56, Tabela 22 (profundidade máxima 0,3–0,5 m) |
 | `z2` | Espessura da Camada 2 (abaixo da zona radicular: 20 a 40 cm) | `200` | `mm` | premissa do modelo |
 | `AD` | Capacidade de água disponível na zona radicular | `28.0` | `mm` | derivado: AD = (θ_cc − θ_pmp) × z1 |
 | `θ_lim` | Limiar crítico de umidade volumétrica na Camada 1 para conforto hídrico e disparo da E1 | `0.231` | `cm³/cm³` | derivado: θ_lim = θ_cc − p × (θ_cc − θ_pmp) |
@@ -480,10 +480,10 @@ Série diária completa: [`rodadas/rodadas_varredura_reservatorio_e3_diario.csv`
 | **Versão do SQLite (`sqlite3`)** | `3.45.1` |
 | **Versão do `matplotlib`** | `3.11.2` |
 | **Versão do `numpy`** | `2.5.4` |
-| **Hash do commit Git** | `35f218c0bbc7de63e76c8bfaf7e416676741e3e1` |
+| **Hash do commit Git** | `52287bb1eb6488fa0d95b405d44a358b111a0f6b` |
 | **Comando exato para reproduzir todas as rodadas, tabelas, figuras e relatório do zero** | `python3 main.py pipeline --modelo v1` |
 | **Comando exato para executar a suíte de testes de validação** | `python3 -m unittest discover -s tests -v` |
-| **Tempo de execução total medido** | `6.773 segundos` |
+| **Tempo de execução total medido** | `6.414 segundos` |
 | **Confirmação sobre aleatoriedade** | Não há aleatoriedade em nenhum componente do projeto. Nenhum gerador pseudoaleatório (random / numpy.random) é importado ou invocado; todas as equações físicas, regras de decisão e agregações são estritamente determinísticas. |
 | **Semente aleatória (`seed`)** | `Não aplicável (modelo 100% determinístico)` |
 

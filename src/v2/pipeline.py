@@ -24,16 +24,16 @@ from src.v2.comparacao_v1 import ResultadosV1, rodar_v1
 from src.v2.dados_externos import (
     AFIRMACOES_ARTIGO,
     ANOS_VIZINHOS,
-    PESOS_JANELA_NORMAL,
+    FONTE_MEDIA_CHUVA,
+    PESOS_JANELA_MEDIA,
     CompletudeJanela,
-    FormatoNaoReconhecido,
-    NormalEstacao,
+    MediaChuva,
     StatusArquivo,
     arquivo_a204_do_ano,
     completude_ano,
     completude_janela,
     janelas_do_ano,
-    ler_normal_balsas,
+    ler_media_chuva,
     status_dados_externos,
 )
 from src.v2.diagnosticos import DiagnosticoCiclo, diagnosticar_ciclo, rs_rso_no_ano
@@ -90,8 +90,7 @@ class Resultados:
     v1: ResultadosV1
     diagnosticos: Dict[str, DiagnosticoCiclo]
     rs_rso_ano: Dict[str, float]
-    normal: Optional[NormalEstacao]
-    normal_situacao: str
+    media_chuva: MediaChuva
     completude: List[CompletudeJanela]
     externos: List[StatusArquivo]
     sens_e1_laminas: Tuple[float, ...] = LAMINAS_E1_MM
@@ -303,7 +302,7 @@ def tab_clima_ciclos(esc: Escritor) -> None:
         hs = sum(d.et0_hs_mm for d in c.dias)
         etc = res.sequeiro[ciclo].metricas.etc_mm
         maior = max(c.dias, key=lambda d: d.p_mm)
-        normal = res.normal.janela(PESOS_JANELA_NORMAL[ciclo]) if res.normal else None
+        media = res.media_chuva.janela(PESOS_JANELA_MEDIA[ciclo])
         chuva = sum(h.p_mm for h in c.horas)
         r = {
             "ciclo": ciclo, "inicio": c.inicio, "fim": c.fim, "horas": len(c.horas), "dias": c.n_dias,
@@ -315,13 +314,12 @@ def tab_clima_ciclos(esc: Escritor) -> None:
             "dias_com_chuva": sum(1 for d in c.dias if d.p_mm > 0),
             "maior_chuva_diaria_mm": maior.p_mm, "data_maior_chuva_diaria": maior.data,
             "maior_chuva_horaria_mm": max(h.p_mm for h in c.horas),
-            "normal_janela_mm": normal,
-            "chuva_sobre_normal_pct": (chuva / normal * 100.0) if normal else None,
+            "media_janela_mm": media,
+            "chuva_sobre_media_pct": chuva / media * 100.0,
         }
         por_ciclo[ciclo] = r
         registros.append((ciclo, r))
     campos = list(registros[0][1].keys())
-    sem_normal = "[A CONFIRMAR PELO AUTOR]"
 
     def linha(rot, chave, fmt):
         return [rot] + [fmt(por_ciclo[c][chave], c) for c in CICLOS]
@@ -330,8 +328,8 @@ def tab_clima_ciclos(esc: Escritor) -> None:
         linha("Período (dias locais)", "inicio", lambda v, c: f"{por_ciclo[c]['inicio']:%d/%m} a {por_ciclo[c]['fim']:%d/%m/%Y}"),
         linha("Horas", "horas", lambda v, c: inteiro(v)),
         linha("P (mm)", "chuva_mm", lambda v, c: num(v)),
-        linha("Normal 1991–2020 da janela (mm)", "normal_janela_mm", lambda v, c: num(v) if v is not None else sem_normal),
-        linha("P/normal (%)", "chuva_sobre_normal_pct", lambda v, c: num(v) if v is not None else sem_normal),
+        linha("Média 1991–2021 da janela (mm)", "media_janela_mm", lambda v, c: num(v)),
+        linha("P/média (%)", "chuva_sobre_media_pct", lambda v, c: num(v)),
         linha("ΣET0 PM (mm)", "et0_pm_mm", lambda v, c: num(v)),
         linha("ET0 PM média (mm/d)", "et0_pm_mm_dia", lambda v, c: num(v, 2)),
         linha("ΣET0 HS (mm)", "et0_hs_mm", lambda v, c: num(v)),
@@ -344,12 +342,11 @@ def tab_clima_ciclos(esc: Escritor) -> None:
               lambda v, c: f"{num(v)} ({por_ciclo[c]['data_maior_chuva_diaria']:%d/%m})"),
         linha("Maior chuva horária (mm)", "maior_chuva_horaria_mm", lambda v, c: num(v)),
     ]
-    extra_normal = [] if res.normal else [
-        f"A normal 1991–2020 não foi calculada: {res.normal_situacao}"]
     md = tabela_markdown(["Variável", "Chuvoso", "Seco"], linhas_md, titulo="**Clima dos ciclos (A204, Balsas-MA, 2023)**",
                          notas=notas("P", "ET0", "PM", "HS", "ETc", "u2", extra=[
                              "Viés = (ΣET0 HS − ΣET0 PM)/ΣET0 PM. ETc com a curva de Kc do FAO-56 (eq. 66). "
-                             "Dia local = UTC − 3. ET0 horária negativa zerada."] + extra_normal))
+                             "Dia local = UTC − 3. ET0 horária negativa zerada.",
+                             f"Média da janela: {FONTE_MEDIA_CHUVA}, ponderada pelos dias de cada mês na janela."]))
     esc.tabela("tab_clima_ciclos", "clima dos dois ciclos (uma linha por ciclo)", res.par, campos, registros, md)
 
 
@@ -403,7 +400,7 @@ CASAS_PARAMETROS = {
 FONTES_PARAMETROS = {
     "solo": "FAO-56, Tabela 19 (solo franco: θcc 0,20–0,30; θpmp 0,07–0,17); página [A CONFIRMAR PELO AUTOR]",
     "p": "FAO-56, Tabela 22 (alface, p = 0,30)",
-    "z1": "Marouelli et al. (2008), página [A CONFIRMAR PELO AUTOR]; FAO-56, Tabela 22 (0,3–0,5 m)",
+    "z1": "Marouelli, Silva e Silva (2008, p. 84), Tabela 25: 15 cm na fase vegetativa e 20 cm nas fases 3 e 4; o modelo usa 20 cm; FAO-56, Tabela 22 (0,3–0,5 m)",
     "kc": "FAO-56, Tabela 12",
     "fases": "FAO-56, Tabela 11 (alface 20/30/15/10 d), escalonada a 70 d",
     "derivado": "derivado (calculado pelo código)",
@@ -716,42 +713,37 @@ def tab_dados_externos(esc: Escritor) -> None:
                             titulo="**Dados externos**",
                             notas=["Arquivos ausentes não são estimados. Depois de baixá-los, rode "
                                    "`python3 main.py dados --preparar` e `python3 main.py pipeline`."])
-    esc.tabela("tab_dados_externos", "situação dos arquivos externos (normal e anos vizinhos)", res.par,
+    esc.tabela("tab_dados_externos", "situação dos arquivos externos (anos vizinhos)", res.par,
                ["descricao", "destino", "url", "situacao"], registros, texto)
 
 
 def tab_normal(esc: Escritor) -> None:
     res = esc.res
-    campos = ["ciclo", "meses_e_pesos", "normal_jan_mm", "normal_fev_mm", "normal_mar_mm", "normal_jul_mm",
-              "normal_ago_mm", "normal_set_mm", "normal_janela_mm", "chuva_2023_mm", "chuva_sobre_normal_pct",
-              "estacao_normal", "arquivo", "sha256", "situacao"]
+    m = res.media_chuva
+    meses = ((1, "jan"), (2, "fev"), (3, "mar"), (7, "jul"), (8, "ago"), (9, "set"))
+    campos = (["ciclo", "meses_e_pesos"] + [f"media_{nome}_mm" for _, nome in meses]
+              + ["media_janela_mm", "chuva_2023_mm", "chuva_sobre_media_pct", "fonte", "arquivo", "sha256"])
     registros, md = [], []
     for ciclo in CICLOS:
-        pesos = PESOS_JANELA_NORMAL[ciclo]
+        pesos = PESOS_JANELA_MEDIA[ciclo]
         chuva = sum(h.p_mm for h in res.ciclos[ciclo].horas)
-        n = res.normal
-        normal = n.janela(pesos) if n else None
-        mensal = n.mensal_mm if n else {}
+        media = m.janela(pesos)
         r = {"ciclo": ciclo,
-             "meses_e_pesos": "; ".join(f"{m}:{w:.6f}" for m, w in pesos.items()),
-             **{f"normal_{nome}_mm": mensal.get(m) for m, nome in ((1, "jan"), (2, "fev"), (3, "mar"), (7, "jul"), (8, "ago"), (9, "set"))},
-             "normal_janela_mm": normal, "chuva_2023_mm": chuva,
-             "chuva_sobre_normal_pct": chuva / normal * 100 if normal else None,
-             "estacao_normal": f"{n.nome} ({n.codigo})" if n else None, "arquivo": n.arquivo if n else None,
-             "sha256": n.sha256 if n else None, "situacao": "calculada" if n else res.normal_situacao}
+             "meses_e_pesos": "; ".join(f"{mes}:{w:.6f}" for mes, w in pesos.items()),
+             **{f"media_{nome}_mm": m.mensal_mm.get(mes) for mes, nome in meses},
+             "media_janela_mm": media, "chuva_2023_mm": chuva, "chuva_sobre_media_pct": chuva / media * 100,
+             "fonte": FONTE_MEDIA_CHUVA, "arquivo": m.arquivo, "sha256": m.sha256}
         registros.append((ciclo, r))
-        pend = "[A CONFIRMAR PELO AUTOR]"
-        md.append([NOME_CICLO[ciclo], num(chuva), num(normal) if normal is not None else pend,
-                   num(r["chuva_sobre_normal_pct"]) if normal else pend])
+        md.append([NOME_CICLO[ciclo], num(chuva), num(media), num(r["chuva_sobre_media_pct"])])
     notas_md = [
-        "Normal da janela = soma proporcional por dias: chuvoso = jan × 17/31 + fev × 28/28 + mar × 25/31; "
-        "seco = jul + ago + set × 8/30. Fonte: " + "INMET, Normais climatológicas do Brasil 1991-2020 (2022).",
+        "Média da janela = soma das médias mensais ponderadas pelos dias de cada mês na janela: chuvoso = "
+        "jan × 17/31 + fev × 28/28 + mar × 25/31; seco = jul + ago + set × 8/30.",
+        f"Fonte: {FONTE_MEDIA_CHUVA} (arquivo `{m.arquivo}`).",
     ]
-    if not res.normal:
-        notas_md.append(f"Normal não calculada: {res.normal_situacao}")
-    texto = tabela_markdown(["Ciclo", "P 2023 (mm)", "Normal 1991–2020 (mm)", "P/normal (%)"], md,
-                            titulo="**Chuva dos ciclos de 2023 × normal climatológica 1991–2020 (Balsas-MA)**", notas=notas_md)
-    esc.tabela("tab_normal_climatologica", "chuva dos ciclos × normal 1991-2020", res.par, campos, registros, texto)
+    texto = tabela_markdown(["Ciclo", "P 2023 (mm)", "Média 1991–2021 (mm)", "P/média (%)"], md,
+                            titulo="**Chuva dos ciclos de 2023 × média 1991–2021 (Balsas-MA)**", notas=notas_md)
+    esc.tabela("tab_normal_climatologica", "chuva dos ciclos × média 1991-2021 (Corrêa, Carvalho e Mendes, 2023)",
+               res.par, campos, registros, texto)
 
 
 def tab_completude(esc: Escritor) -> None:
@@ -769,7 +761,7 @@ def tab_completude(esc: Escritor) -> None:
         md.append([str(c.ano), c.janela.replace("_", " "), f"{c.inicio:%d/%m} a {c.fim:%d/%m}", inteiro(c.dias),
                    inteiro(c.dias_completos), inteiro(c.dias_parciais), inteiro(c.dias_sem_registro),
                    inteiro(c.maior_lacuna_sem_registro_dias), num(r["horas_validas_pct"])])
-    faltando = [s for s in res.externos if not s.descricao.startswith("Normal") and not (s.presente and s.registrado)]
+    faltando = [s for s in res.externos if not (s.presente and s.registrado)]
     notas_md = ["Dia completo = 24 horas com todas as variáveis usadas no v2. Dia sem registro = nenhuma variável em "
                 "nenhuma hora. Lacuna = dias consecutivos sem registro. Dias locais (UTC − 3); o último dia local do ano "
                 "depende das 3 primeiras horas UTC do arquivo do ano seguinte."]
@@ -785,29 +777,16 @@ def tab_completude(esc: Escritor) -> None:
 # Execução
 # ---------------------------------------------------------------------------
 
-def carregar_dados_externos(estacao: EstacaoINMET, registros_2023) -> Tuple[Optional[NormalEstacao], str, List[CompletudeJanela], List[StatusArquivo]]:
+def carregar_dados_externos(estacao: EstacaoINMET, registros_2023) -> Tuple[MediaChuva, List[CompletudeJanela], List[StatusArquivo]]:
     externos = status_dados_externos()
     registro = ler_registro_sha256()
-    normal, situacao = None, ""
-    s_normal = externos[0]
-    if not s_normal.presente:
-        situacao = f"arquivo ausente; baixar de {s_normal.url} para {s_normal.destino}"
-    elif not s_normal.registrado:
-        situacao = f"{s_normal.destino} sem SHA-256 registrado; rode python3 main.py dados --preparar"
-    else:
-        try:
-            normal = ler_normal_balsas()
-            if registro.get("normais/" + os.path.basename(normal.arquivo)) != normal.sha256:
-                normal, situacao = None, f"SHA-256 de {s_normal.destino} não confere com o registro"
-        except FormatoNaoReconhecido as exc:
-            situacao = f"planilha em formato não reconhecido ({exc})"
     completude = [completude_janela(estacao, registros_2023, 2023, nome, ini, fim)
                   for nome, (ini, fim) in janelas_do_ano(2023).items() if nome in ("chuvoso", "seco")]
     for ano in ANOS_VIZINHOS:
         caminho = arquivo_a204_do_ano(ano)
         if caminho and os.path.basename(caminho) in registro:
             completude += completude_ano(ano, caminho)
-    return normal, situacao, completude, externos
+    return ler_media_chuva(), completude, externos
 
 
 def executar_pipeline(dir_saida: str = DIR_SAIDA_PADRAO, gravar_varredura: bool = True) -> Resultados:
@@ -847,13 +826,13 @@ def executar_pipeline(dir_saida: str = DIR_SAIDA_PADRAO, gravar_varredura: bool 
     z1, sequeiro_z1 = rodar_z1(forcantes, par_z1)
     tempo_rodadas = time.perf_counter() - t_rod
 
-    normal, normal_sit, completude, externos = carregar_dados_externos(estacao, registros)
+    media_chuva, completude, externos = carregar_dados_externos(estacao, registros)
     res = Resultados(
         raiz=dir_tmp, estacao=estacao, ciclos=ciclos, par=par, par_z1=par_z1, forcantes=forcantes,
         principal=principal, sequeiro=sequeiro, sens_e1=sens_e1, varredura=varredura, capacidade_minima=minima,
         z1=z1, sequeiro_z1=sequeiro_z1, v1=rodar_v1(LAMINAS_E1_MM),
         diagnosticos={n: diagnosticar_ciclo(ciclos[n], ciclos_alt[n], par) for n in CICLOS},
-        rs_rso_ano=rs_rso_no_ano(serie), normal=normal, normal_situacao=normal_sit, completude=completude,
+        rs_rso_ano=rs_rso_no_ano(serie), media_chuva=media_chuva, completude=completude,
         externos=externos, tempo_rodadas_s=tempo_rodadas,
     )
 

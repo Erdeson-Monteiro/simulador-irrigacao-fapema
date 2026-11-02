@@ -135,7 +135,6 @@ def conferir_checksums(dir_resultados: str) -> Tuple[int, List[str], int]:
 GRUPOS_PENDENCIAS = (  # chave procurada (sem distinção de maiúsculas) na linha e no título da seção
     ("tabela 19", "Página da Tabela 19 do FAO-56 (θcc e θpmp do solo franco), conferida no PDF"),
     ("marouelli", "Página de Marouelli et al. (2008) com a profundidade da zona radicular da alface (z₁)"),
-    ("normal", "Normal climatológica 1991–2020 de Balsas (planilha do INMET ainda não baixada)"),
     ("2024", "Arquivos de 2024 e 2025 da A204 (zips do INMET ainda não baixados)"),
     ("2025", "Arquivos de 2024 e 2025 da A204 (zips do INMET ainda não baixados)"),
 )
@@ -201,11 +200,11 @@ def markdown_pendencias(achados: List[Tuple[str, int, str]]) -> str:
     return "\n".join(partes)
 
 
-CAMINHOS_DO_CODIGO = ("main.py", "requirements.txt", "src", os.path.join("data", "raw"))
+CAMINHOS_DO_CODIGO = ("main.py", "requirements.txt", "src", os.path.join("data", "raw"), os.path.join("data", "referencias"))
 
 
 def impressao_digital_do_codigo(raiz: str = ROOT_DIR) -> str:
-    """SHA-256 dos arquivos que definem os resultados (código, dependências e dados brutos), em ordem."""
+    """SHA-256 dos arquivos que definem os resultados (código, dependências, dados brutos e de referência), em ordem."""
     arquivos = []
     for item in CAMINHOS_DO_CODIGO:
         caminho = os.path.join(raiz, item)

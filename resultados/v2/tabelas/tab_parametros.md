@@ -6,7 +6,7 @@
 | θpmp | Umidade no ponto de murcha permanente | 0,14 | cm³ cm⁻³ | FAO-56, Tabela 19 (solo franco: θcc 0,20–0,30; θpmp 0,07–0,17); página [A CONFIRMAR PELO AUTOR] |
 | θsat | Umidade na saturação | 0,45 | cm³ cm⁻³ | premissa do modelo, sem efeito nas métricas (teste) |
 | p | Fração da TAW esgotável sem estresse | 0,30 | — | FAO-56, Tabela 22 (alface, p = 0,30) |
-| z₁ | Espessura da camada 1 (zona radicular efetiva, 0–20 cm) | 200,0 | mm | Marouelli et al. (2008), página [A CONFIRMAR PELO AUTOR]; FAO-56, Tabela 22 (0,3–0,5 m) |
+| z₁ | Espessura da camada 1 (zona radicular efetiva, 0–20 cm) | 200,0 | mm | Marouelli, Silva e Silva (2008, p. 84), Tabela 25: 15 cm na fase vegetativa e 20 cm nas fases 3 e 4; o modelo usa 20 cm; FAO-56, Tabela 22 (0,3–0,5 m) |
 | z₂ | Espessura da camada 2 (20–40 cm) | 200,0 | mm | premissa do modelo, sem efeito nas métricas (teste) |
 | f_ext2 | Fração da ETa retirada da camada 2 | 0,0 | — | premissa do modelo |
 | θ₁(0), θ₂(0) | Umidade inicial das camadas (perfil na capacidade de campo) | 0,28 | cm³ cm⁻³ | premissa do modelo |

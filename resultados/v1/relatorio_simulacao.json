@@ -3931,7 +3931,7 @@
       "significado": "Espessura da Camada 1 (zona radicular ativa: 0 a 20 cm)",
       "valor": "200",
       "unidade": "mm",
-      "origem": "Marouelli et al. (2008), página [A CONFIRMAR PELO AUTOR]; FAO-56, Tabela 22 (profundidade máxima 0,3–0,5 m)"
+      "origem": "Marouelli, Silva e Silva (2008, p. 84), Tabela 25: 15 cm na fase vegetativa e 20 cm nas fases 3 e 4; o modelo usa 20 cm; FAO-56, Tabela 22 (profundidade máxima 0,3–0,5 m)"
     },
     {
       "simbolo": "z2",
@@ -4153,10 +4153,10 @@
     "sqlite3_version": "3.45.1",
     "matplotlib_version": "3.11.2",
     "numpy_version": "2.5.4",
-    "git_commit_hash": "35f218c0bbc7de63e76c8bfaf7e416676741e3e1",
+    "git_commit_hash": "52287bb1eb6488fa0d95b405d44a358b111a0f6b",
     "comando_reproducao": "python3 main.py pipeline --modelo v1",
     "comando_testes": "python3 -m unittest discover -s tests -v",
-    "tempo_execucao_total_s": 6.773,
+    "tempo_execucao_total_s": 6.414,
     "aleatoriedade": "Não há aleatoriedade em nenhum componente do projeto. Nenhum gerador pseudoaleatório (random / numpy.random) é importado ou invocado; todas as equações físicas, regras de decisão e agregações são estritamente determinísticas.",
     "semente_aleatoria": "Não aplicável (modelo 100% determinístico)"
   },

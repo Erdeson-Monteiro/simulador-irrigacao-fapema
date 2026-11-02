@@ -137,7 +137,7 @@ Com f_ext2 = 0 e θ₂(0) = θcc, a camada 2 fica em θcc e D₂ = D₁ em todas
 
 ## 9. Limitações
 
-1. **Um só ano.** As simulações usam 2023, o ano mais recente com os dois ciclos completos na estação A204. O pipeline compara a chuva dos ciclos com a normal 1991–2020 e confere a completude de 2024 e 2025, mas não simula outros anos.
+1. **Um só ano.** As simulações usam 2023, o ano mais recente com os dois ciclos completos na estação A204. O pipeline compara a chuva dos ciclos com a média 1991–2021 da estação 82768 (Corrêa, Carvalho e Mendes, 2023) e confere a completude de 2024 e 2025, mas não simula outros anos.
 2. **Camada 2 sem extração** (f_ext2 = 0) e sem ascensão capilar.
 3. **Drenagem instantânea:** toda água acima de θcc sai da camada na mesma hora, sem curva de condutividade.
 4. **Sem escoamento superficial:** toda a chuva infiltra, inclusive nas horas de chuva intensa.

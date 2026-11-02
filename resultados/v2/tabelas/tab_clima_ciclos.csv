@@ -2,6 +2,6 @@
 # origem: PIC/FAPEMA, simulador de irrigação v2 (docs/MODELO.md); gerado por python3 main.py pipeline
 # clima: data/raw/INMET_NE_MA_A204_BALSAS_01-01-2023_A_31-12-2023.CSV (SHA-256 7aa68f3a9a2c09ef19a822490fb5fe957c1e0b37bed7ca6b084e3e38d450b233); estação A204 BALSAS-MA, lat -7.45555555, lon -46.02749999, alt 271.03 m
 # parametros: theta_cc=0.28; theta_pmp=0.14; theta_sat=0.45; p=0.3; z1_mm=200; z2_mm=200; f_ext2=0; theta1_inicial=0.28; theta2_inicial=0.28; kc_ini=0.7; kc_mid=1; kc_end=0.95; fases_tabela_dias=20/30/15/10; duracao_ciclo_dias=70; lamina_e1_mm=10; area_m2=10; taw_mm=28; raw_mm=8.4; theta_lim=0.238; fases_dias=19/28/14/9; s1_cc_mm=56; s1_pmp_mm=28; s2_cc_mm=56
-ciclo,inicio,fim,horas,dias,chuva_mm,et0_pm_mm,et0_pm_mm_dia,et0_hs_mm,et0_hs_mm_dia,vies_hs_pct,etc_mm,etc_mm_dia,t_media_c,u2_medio_ms,dias_com_chuva,maior_chuva_diaria_mm,data_maior_chuva_diaria,maior_chuva_horaria_mm,normal_janela_mm,chuva_sobre_normal_pct
-chuvoso,2023-01-15,2023-03-25,1680,70,299.200000,278.956281,3.985090,357.352801,5.105040,28.103515,237.863721,3.398053,25.630595,0.714026,41,77.800000,2023-03-17,40.000000,,
-seco,2023-07-01,2023-09-08,1680,70,42.200000,358.463701,5.120910,409.399326,5.848562,14.209423,308.455116,4.406502,27.361905,1.043971,4,26.200000,2023-08-31,16.200000,,
+ciclo,inicio,fim,horas,dias,chuva_mm,et0_pm_mm,et0_pm_mm_dia,et0_hs_mm,et0_hs_mm_dia,vies_hs_pct,etc_mm,etc_mm_dia,t_media_c,u2_medio_ms,dias_com_chuva,maior_chuva_diaria_mm,data_maior_chuva_diaria,maior_chuva_horaria_mm,media_janela_mm,chuva_sobre_media_pct
+chuvoso,2023-01-15,2023-03-25,1680,70,299.200000,278.956281,3.985090,357.352801,5.105040,28.103515,237.863721,3.398053,25.630595,0.714026,41,77.800000,2023-03-17,40.000000,455.016129,65.755911
+seco,2023-07-01,2023-09-08,1680,70,42.200000,358.463701,5.120910,409.399326,5.848562,14.209423,308.455116,4.406502,27.361905,1.043971,4,26.200000,2023-08-31,16.200000,8.760000,481.735160

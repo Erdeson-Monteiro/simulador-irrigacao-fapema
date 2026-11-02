@@ -7,7 +7,7 @@ Uso:
   python3 main.py pipeline --modelo v1   # modelo v1 (linha de base do parecer): resultados/v1/
   python3 main.py simular --ciclo chuvoso --cenario Abundante   # só recarrega o banco do painel
   python3 main.py serve                  # API e painel (não roda simulação)
-  python3 main.py dados [--preparar]     # normal 1991–2020 e arquivos de 2024/2025
+  python3 main.py dados [--preparar]     # arquivos de 2024 e 2025 da A204
   python3 main.py conferir               # confere NUMEROS_ARTIGO.md e CHECKSUMS.txt
 
 Variáveis de ambiente (veja .env.example): PORT, HOST, DB_PATH, DEVICE_TOKEN, CORS_ORIGIN.
@@ -238,7 +238,7 @@ def main(argv=None) -> int:
     sv = sub.add_parser("serve", help="serve a API e o painel (exige DEVICE_TOKEN)")
     sv.set_defaults(func=comando_serve)
 
-    d = sub.add_parser("dados", help="situação dos arquivos externos (normal 1991–2020, 2024 e 2025)")
+    d = sub.add_parser("dados", help="situação dos arquivos externos (2024 e 2025 da A204)")
     d.add_argument("--preparar", action="store_true", help="extrai a A204 dos zips e registra os SHA-256")
     d.set_defaults(func=comando_dados)
 

@@ -1,25 +1,25 @@
 """
-Dados externos do v2: normal climatológica 1991–2020 e arquivos da
-A204 de 2024 e 2025. Nada aqui baixa arquivos nem estima valores: quando um arquivo falta,
-o programa diz a URL exata e a pasta onde colocá-lo.
+Dados externos do v2: média de chuva de referência e arquivos da A204 de 2024 e 2025. Nada
+aqui baixa arquivos nem estima valores: quando um arquivo falta, o programa diz a URL exata e
+a pasta onde colocá-lo.
 
-Passo a passo para o autor:
-  1. baixar `Normal-Climatologica-PREC.xlsx` para `data/raw/normais/`;
-  2. baixar `2024.zip` e `2025.zip` para `data/raw/downloads/` (pasta fora do git);
-  3. rodar `python3 main.py dados --preparar`: extrai só o arquivo da A204 de cada zip
-     para `data/raw/` e registra o SHA-256 de tudo em `data/raw/SHA256SUMS`;
-  4. rodar `python3 main.py pipeline`.
+- Média de chuva: médias mensais de 1991–2021 da estação convencional 82768 (Balsas), da
+  Tabela 6 de Corrêa, Carvalho e Mendes (2023), em `data/referencias/` (versionado).
+- Anos vizinhos, passo a passo para o autor:
+  1. baixar `2024.zip` e `2025.zip` para `data/raw/downloads/` (pasta fora do git);
+  2. rodar `python3 main.py dados --preparar`: extrai só o arquivo da A204 de cada zip
+     para `data/raw/` e registra o SHA-256 em `data/raw/SHA256SUMS`;
+  3. rodar `python3 main.py pipeline`.
 """
 
 from __future__ import annotations
 
+import csv
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 import math
 import os
 import re
-import unicodedata
-import xml.etree.ElementTree as ET
 import zipfile
 from typing import Dict, List, Optional, Sequence, Tuple
 
@@ -37,29 +37,19 @@ from src.v2.inmet import (
 )
 
 
-PAGINA_NORMAIS = "https://portal.inmet.gov.br/normais"
-URL_NORMAL_PREC = "https://portal.inmet.gov.br/uploads/normais/Normal-Climatologica-PREC.xlsx"
 URL_DADOS_ANO = "https://portal.inmet.gov.br/uploads/dadoshistoricos/{ano}.zip"
-DIR_NORMAIS = os.path.join(DIR_RAW, "normais")
 DIR_DOWNLOADS = os.path.join(DIR_RAW, "downloads")
-ARQUIVO_NORMAL_PREC = os.path.join(DIR_NORMAIS, "Normal-Climatologica-PREC.xlsx")
 ANOS_VIZINHOS = (2024, 2025)
-REFERENCIA_NORMAL = (
-    "INSTITUTO NACIONAL DE METEOROLOGIA (Brasil). Normais climatológicas do Brasil: período "
-    "1991-2020. Organização de Marcia dos Santos Seabra e Edmundo Wallace Monteiro Lucas. "
-    "Ed. digital. Brasília, DF: INMET, 2022."
+
+ARQUIVO_MEDIA_CHUVA = os.path.join(ROOT_DIR, "data", "referencias", "correa_2023_balsas_82768.csv")
+FONTE_MEDIA_CHUVA = (
+    "Corrêa, Carvalho e Mendes (2023), Tabela 6: média 1991–2021 da estação convencional 82768 (Balsas)"
 )
 
-# Pesos por mês para a normal de cada janela (soma proporcional por dias).
-PESOS_JANELA_NORMAL: Dict[str, Dict[int, float]] = {
+# Pesos por mês para a média de cada janela (fração dos dias do mês que caem na janela).
+PESOS_JANELA_MEDIA: Dict[str, Dict[int, float]] = {
     "chuvoso": {1: 17 / 31, 2: 28 / 28, 3: 25 / 31},
     "seco": {7: 1.0, 8: 1.0, 9: 8 / 30},
-}
-
-MESES = {
-    1: ("jan", "janeiro"), 2: ("fev", "fevereiro"), 3: ("mar", "marco"), 4: ("abr", "abril"),
-    5: ("mai", "maio"), 6: ("jun", "junho"), 7: ("jul", "julho"), 8: ("ago", "agosto"),
-    9: ("set", "setembro"), 10: ("out", "outubro"), 11: ("nov", "novembro"), 12: ("dez", "dezembro"),
 }
 
 
@@ -69,10 +59,6 @@ class FormatoNaoReconhecido(ValueError):
 
 def _rel(caminho: str) -> str:
     return os.path.relpath(caminho, ROOT_DIR).replace(os.sep, "/")
-
-
-def _sem_acento(texto: str) -> str:
-    return "".join(c for c in unicodedata.normalize("NFD", texto) if unicodedata.category(c) != "Mn").lower().strip()
 
 
 # ---------------------------------------------------------------------------
@@ -96,142 +82,44 @@ def registrar_sha256(caminho: str, comentario: Optional[str] = None) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Leitura mínima de xlsx (só biblioteca padrão)
+# Média de chuva de referência (Corrêa, Carvalho e Mendes, 2023)
 # ---------------------------------------------------------------------------
 
-_NS = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
-
-
-def _indice_coluna(ref: str) -> int:
-    letras = re.match(r"[A-Z]+", ref).group(0)
-    n = 0
-    for c in letras:
-        n = n * 26 + (ord(c) - 64)
-    return n - 1
-
-
-def ler_xlsx(caminho: str) -> List[List[object]]:
-    """Linhas da primeira planilha, com texto como str e números como float."""
-    with zipfile.ZipFile(caminho) as z:
-        compartilhadas: List[str] = []
-        if "xl/sharedStrings.xml" in z.namelist():
-            raiz = ET.fromstring(z.read("xl/sharedStrings.xml"))
-            for si in raiz.findall("m:si", _NS):
-                compartilhadas.append("".join(t.text or "" for t in si.iter(f"{{{_NS['m']}}}t")))
-        planilhas = sorted(n for n in z.namelist() if re.fullmatch(r"xl/worksheets/sheet\d+\.xml", n))
-        if not planilhas:
-            raise FormatoNaoReconhecido(f"{caminho}: nenhuma planilha encontrada.")
-        raiz = ET.fromstring(z.read(planilhas[0]))
-    linhas: List[List[object]] = []
-    for row in raiz.iter(f"{{{_NS['m']}}}row"):
-        valores: Dict[int, object] = {}
-        for c in row.findall("m:c", _NS):
-            tipo, ref = c.get("t"), c.get("r")
-            v = c.find("m:v", _NS)
-            if tipo == "s" and v is not None:
-                valor: object = compartilhadas[int(v.text)]
-            elif tipo == "inlineStr":
-                valor = "".join(t.text or "" for t in c.iter(f"{{{_NS['m']}}}t"))
-            elif v is not None and v.text is not None:
-                try:
-                    valor = float(v.text)
-                except ValueError:
-                    valor = v.text
-            else:
-                continue
-            valores[_indice_coluna(ref)] = valor
-        if valores:
-            linha = [None] * (max(valores) + 1)
-            for i, val in valores.items():
-                linha[i] = val
-            linhas.append(linha)
-    return linhas
-
-
-def _numero(valor: object) -> Optional[float]:
-    if isinstance(valor, float):
-        return valor
-    if isinstance(valor, str):
-        s = valor.strip().replace(".", "").replace(",", ".") if "," in valor else valor.strip()
-        try:
-            return float(s)
-        except ValueError:
-            return None
-    return None
-
-
 @dataclass
-class NormalEstacao:
-    nome: str
-    codigo: Optional[str]
-    uf: Optional[str]
-    mensal_mm: Dict[int, Optional[float]]
-    linha_planilha: int
+class MediaChuva:
+    mensal_mm: Dict[int, float]
     arquivo: str
     sha256: str
 
-    def janela(self, pesos: Dict[int, float]) -> Optional[float]:
-        if any(self.mensal_mm.get(m) is None for m in pesos):
-            return None
+    def janela(self, pesos: Dict[int, float]) -> float:
+        faltam = sorted(m for m in pesos if m not in self.mensal_mm)
+        if faltam:
+            raise FormatoNaoReconhecido(f"{self.arquivo}: faltam os meses {faltam} para calcular a janela.")
         return sum(self.mensal_mm[m] * w for m, w in pesos.items())
 
 
-def ler_normal_balsas(caminho: str = ARQUIVO_NORMAL_PREC) -> NormalEstacao:
+def ler_media_chuva(caminho: str = ARQUIVO_MEDIA_CHUVA) -> MediaChuva:
     """
-    Localiza a linha de BALSAS (MA) pelo nome e lê os 12 meses pelo cabeçalho. Qualquer
-    ambiguidade (nenhuma ou mais de uma linha, cabeçalho sem os 12 meses) é erro.
+    Médias mensais de chuva (mm), com colunas `mes,precipitacao_media_mm` e linhas `#` de
+    comentário. Mês fora de 1–12 ou repetido, valor negativo ou não numérico é erro.
     """
     if not os.path.exists(caminho):
-        raise FileNotFoundError(caminho)
-    linhas = ler_xlsx(caminho)
-
-    idx_cab, col_mes = None, {}
-    for i, linha in enumerate(linhas):
-        achados = {}
-        for j, cel in enumerate(linha):
-            if isinstance(cel, str):
-                t = _sem_acento(cel)
-                for m, (abrev, nome) in MESES.items():
-                    if t in (abrev, nome):
-                        achados[m] = j
-        if len(achados) == 12:
-            idx_cab, col_mes = i, achados
-            break
-    if idx_cab is None:
-        raise FormatoNaoReconhecido(f"{caminho}: cabeçalho com os 12 meses não encontrado.")
-
-    cabecalho = [(_sem_acento(c) if isinstance(c, str) else "") for c in linhas[idx_cab]]
-    col_uf = next((j for j, c in enumerate(cabecalho) if c == "uf"), None)
-    col_codigo = next((j for j, c in enumerate(cabecalho) if c.startswith("codigo")), None)
-
-    candidatas = []
-    for i in range(idx_cab + 1, len(linhas)):
-        linha = linhas[i]
-        textos = [_sem_acento(c) for c in linha if isinstance(c, str)]
-        if not any(re.search(r"\bbalsas\b", t) for t in textos):
-            continue
-        uf = linha[col_uf] if col_uf is not None and col_uf < len(linha) else None
-        if uf is not None and _sem_acento(str(uf)) != "ma":
-            continue
-        candidatas.append(i)
-    if len(candidatas) != 1:
-        raise FormatoNaoReconhecido(
-            f"{caminho}: esperada uma linha de BALSAS (MA); encontradas {len(candidatas)}."
-        )
-    i = candidatas[0]
-    linha = linhas[i]
-    nome = next(c for c in linha if isinstance(c, str) and re.search(r"\bbalsas\b", _sem_acento(c)))
-    mensal = {m: _numero(linha[j]) if j < len(linha) else None for m, j in col_mes.items()}
-    codigo = linha[col_codigo] if col_codigo is not None and col_codigo < len(linha) else None
-    return NormalEstacao(
-        nome=str(nome).strip(),
-        codigo=None if codigo is None else str(codigo).replace(".0", ""),
-        uf=None if col_uf is None else str(linha[col_uf]),
-        mensal_mm=mensal,
-        linha_planilha=i + 1,
-        arquivo=_rel(caminho),
-        sha256=sha256_arquivo(caminho),
-    )
+        raise FileNotFoundError(f"Arquivo de referência não encontrado: {caminho}.")
+    with open(caminho, encoding="utf-8", newline="") as f:
+        leitor = csv.DictReader(linha for linha in f if not linha.startswith("#"))
+        if leitor.fieldnames != ["mes", "precipitacao_media_mm"]:
+            raise FormatoNaoReconhecido(
+                f"{caminho}: colunas esperadas mes,precipitacao_media_mm; lidas {leitor.fieldnames}.")
+        mensal: Dict[int, float] = {}
+        for linha in leitor:
+            try:
+                mes, valor = int(linha["mes"]), float(linha["precipitacao_media_mm"])
+            except (TypeError, ValueError) as exc:
+                raise FormatoNaoReconhecido(f"{caminho}: linha inválida {dict(linha)}.") from exc
+            if not 1 <= mes <= 12 or mes in mensal or valor < 0:
+                raise FormatoNaoReconhecido(f"{caminho}: mês {mes} fora de 1–12, repetido ou com valor negativo.")
+            mensal[mes] = valor
+    return MediaChuva(mensal_mm=mensal, arquivo=_rel(caminho), sha256=sha256_arquivo(caminho))
 
 
 # ---------------------------------------------------------------------------
@@ -276,11 +164,7 @@ class StatusArquivo:
 
 def status_dados_externos() -> List[StatusArquivo]:
     registro = ler_registro_sha256()
-    itens = [StatusArquivo(
-        "Normal climatológica 1991–2020, precipitação (planilha do INMET)",
-        _rel(ARQUIVO_NORMAL_PREC), URL_NORMAL_PREC, os.path.exists(ARQUIVO_NORMAL_PREC),
-        os.path.relpath(ARQUIVO_NORMAL_PREC, DIR_RAW).replace(os.sep, "/") in registro,
-    )]
+    itens = []
     for ano in ANOS_VIZINHOS:
         extraido = arquivo_a204_do_ano(ano)
         itens.append(StatusArquivo(
@@ -305,11 +189,6 @@ def preparar_dados_externos() -> List[str]:
         h = registrar_sha256(extraido, f"extraído de {ano}.zip ({URL_DADOS_ANO.format(ano=ano)}), "
                                        f"SHA-256 do zip {sha256_arquivo(zip_ano)}")
         mensagens.append(f"{ano}: {_rel(extraido)} registrado (SHA-256 {h}).")
-    if os.path.exists(ARQUIVO_NORMAL_PREC):
-        h = registrar_sha256(ARQUIVO_NORMAL_PREC, f"baixado de {URL_NORMAL_PREC}")
-        mensagens.append(f"normal: {_rel(ARQUIVO_NORMAL_PREC)} registrado (SHA-256 {h}).")
-    else:
-        mensagens.append(f"normal: falta {_rel(ARQUIVO_NORMAL_PREC)} (baixar de {URL_NORMAL_PREC}).")
     return mensagens
 
 

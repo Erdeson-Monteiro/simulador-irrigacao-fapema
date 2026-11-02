@@ -21,40 +21,13 @@ from src.v2.conferencia import (
 )
 from src.v2.dados_externos import (
     FormatoNaoReconhecido,
-    PESOS_JANELA_NORMAL,
+    PESOS_JANELA_MEDIA,
     completude_janela,
     extrair_a204_do_zip,
-    ler_normal_balsas,
+    ler_media_chuva,
 )
 from src.v2.formatacao import inteiro, num
 from src.v2.inmet import ler_arquivo_inmet
-
-
-def escrever_xlsx(caminho, linhas):
-    """Planilha mínima (só para teste) no formato Office Open XML, com textos compartilhados."""
-    textos, indice = [], {}
-    xml_linhas = []
-    for i, linha in enumerate(linhas, start=1):
-        celulas = []
-        for j, valor in enumerate(linha):
-            ref = f"{chr(65 + j) if j < 26 else 'A' + chr(65 + j - 26)}{i}"
-            if valor is None:
-                continue
-            if isinstance(valor, str):
-                if valor not in indice:
-                    indice[valor] = len(textos)
-                    textos.append(valor)
-                celulas.append(f'<c r="{ref}" t="s"><v>{indice[valor]}</v></c>')
-            else:
-                celulas.append(f'<c r="{ref}"><v>{valor}</v></c>')
-        xml_linhas.append(f'<row r="{i}">{"".join(celulas)}</row>')
-    ns = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"'
-    with zipfile.ZipFile(caminho, "w") as z:
-        z.writestr("xl/sharedStrings.xml", f'<sst {ns}>' + "".join(f"<si><t>{t}</t></si>" for t in textos) + "</sst>")
-        z.writestr("xl/worksheets/sheet1.xml", f'<worksheet {ns}><sheetData>{"".join(xml_linhas)}</sheetData></worksheet>')
-
-
-MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 
 
 class TestFormatacao(unittest.TestCase):
@@ -68,36 +41,38 @@ class TestFormatacao(unittest.TestCase):
         self.assertEqual(num(None), "—")
 
 
-class TestNormalClimatologica(unittest.TestCase):
-    def planilha(self, tmp, linhas_estacoes):
-        caminho = os.path.join(tmp, "normal.xlsx")
-        escrever_xlsx(caminho, [["Normais Climatológicas do Brasil 1991-2020 (planilha de teste)"],
-                                ["Código", "Nome da Estação", "UF"] + MESES + ["Ano"]] + linhas_estacoes)
-        return caminho
+class TestMediaChuva(unittest.TestCase):
+    """Média 1991–2021 da estação 82768 (Corrêa, Carvalho e Mendes, 2023, Tabela 6)."""
 
-    def test_le_balsas_e_calcula_a_janela(self):
-        mensal = [float(10 * m) for m in range(1, 13)]
-        with tempfile.TemporaryDirectory() as tmp:
-            caminho = self.planilha(tmp, [[82676, "OUTRA", "MA"] + [1.0] * 12 + [12.0],
-                                          [82768, "BALSAS", "MA"] + mensal + [sum(mensal)]])
-            n = ler_normal_balsas(caminho)
-        self.assertEqual(n.nome, "BALSAS")
-        self.assertEqual(n.mensal_mm[3], 30.0)
-        self.assertAlmostEqual(n.janela(PESOS_JANELA_NORMAL["chuvoso"]), 10 * 17 / 31 + 20 + 30 * 25 / 31, places=9)
-        self.assertAlmostEqual(n.janela(PESOS_JANELA_NORMAL["seco"]), 70 + 80 + 90 * 8 / 30, places=9)
+    def test_janelas_ponderadas_pelos_dias(self):
+        m = ler_media_chuva()
+        self.assertEqual(m.arquivo, "data/referencias/correa_2023_balsas_82768.csv")
+        self.assertAlmostEqual(m.janela(PESOS_JANELA_MEDIA["chuvoso"]), 221.8 * 17 / 31 + 187.9 + 180.4 * 25 / 31, places=9)
+        self.assertAlmostEqual(m.janela(PESOS_JANELA_MEDIA["seco"]), 2.5 + 1.3 + 18.6 * 8 / 30, places=9)
 
-    def test_ambiguidade_e_erro(self):
+    def test_arquivo_fora_do_formato_e_erro(self):
+        casos = {
+            "colunas": "mes,chuva_mm\n1,10\n",
+            "mes_repetido": "mes,precipitacao_media_mm\n1,10\n1,20\n",
+            "mes_invalido": "mes,precipitacao_media_mm\n13,10\n",
+            "negativo": "mes,precipitacao_media_mm\n1,-1\n",
+            "nao_numerico": "mes,precipitacao_media_mm\n1,abc\n",
+        }
         with tempfile.TemporaryDirectory() as tmp:
-            caminho = self.planilha(tmp, [[1, "BALSAS", "MA"] + [1.0] * 12, [2, "BALSAS", "MA"] + [2.0] * 12])
+            for nome, conteudo in casos.items():
+                caminho = os.path.join(tmp, f"{nome}.csv")
+                with open(caminho, "w", encoding="utf-8") as f:
+                    f.write("# comentário\n" + conteudo)
+                with self.subTest(caso=nome), self.assertRaises(FormatoNaoReconhecido):
+                    ler_media_chuva(caminho)
+
+    def test_mes_ausente_na_janela_e_erro(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            caminho = os.path.join(tmp, "incompleta.csv")
+            with open(caminho, "w", encoding="utf-8") as f:
+                f.write("mes,precipitacao_media_mm\n1,10\n2,20\n")
             with self.assertRaises(FormatoNaoReconhecido):
-                ler_normal_balsas(caminho)
-
-    def test_sem_cabecalho_de_meses_e_erro(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            caminho = os.path.join(tmp, "normal.xlsx")
-            escrever_xlsx(caminho, [["Código", "Estação", "UF", "Jan"], [1, "BALSAS", "MA", 1.0]])
-            with self.assertRaises(FormatoNaoReconhecido):
-                ler_normal_balsas(caminho)
+                ler_media_chuva(caminho).janela(PESOS_JANELA_MEDIA["chuvoso"])
 
 
 class TestAnosVizinhos(unittest.TestCase):
